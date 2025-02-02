@@ -1,0 +1,27 @@
+{
+  "canisters": {
+    "UbuzimaChain_backend": {
+      "candid": "src/UbuzimaChain_backend/UbuzimaChain_backend.did",
+      "package": "UbuzimaChain_backend",
+      "type": "rust"
+    },
+    "UbuzimaChain_frontend": {
+      "dependencies": [
+        "UbuzimaChain_backend"
+      ],
+      "source": [
+        "src/UbuzimaChain_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "UbuzimaChain_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

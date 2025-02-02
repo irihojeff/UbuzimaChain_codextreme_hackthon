@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/UbuzimaChain_backend"
+]
+resolver = "2"
