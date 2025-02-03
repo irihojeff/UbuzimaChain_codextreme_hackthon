@@ -4,7 +4,6 @@ use ic_cdk_macros::*;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::cell::RefCell;
-use uuid::Uuid;
 
 // Types
 #[derive(CandidType, Serialize, Deserialize, Clone)]
@@ -43,6 +42,17 @@ fn generate_token(user_id: &str) -> String {
     format!("token_{}", user_id)
 }
 
+// Generate a unique ID using IC timestamp and a counter
+fn generate_unique_id() -> String {
+    let timestamp = time();
+    static mut COUNTER: u64 = 0;
+    let id = unsafe {
+        COUNTER += 1;
+        format!("{}-{}", timestamp, COUNTER)
+    };
+    id
+}
+
 // Canister methods
 #[update]
 fn register(payload: AuthPayload) -> Result<String, String> {
@@ -55,7 +65,7 @@ fn register(payload: AuthPayload) -> Result<String, String> {
         }
 
         let user = User {
-            id: Uuid::new_v4().to_string(),
+            id: generate_unique_id(),  // Using our new ID generator
             username: payload.username,
             password_hash: hash_password(&payload.password),
             created_at: time(),

@@ -1,0 +1,3 @@
+// Ensure that any code accessing process.env is correctly handled
+console.log(import.meta.env.VITE_API_URL); // Replace with your actual environment variable
+// ...existing code...

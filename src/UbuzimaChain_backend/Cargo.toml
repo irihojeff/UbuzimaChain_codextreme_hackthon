@@ -1,9 +1,8 @@
 [package]
-name = "UbuzimaChain_backend"
+name = "UbuzimaChain_backend"  # Keeping original name
 version = "0.1.0"
 edition = "2018"
 
-# This is crucial - it tells Rust to build a WASM file
 [lib]
 crate-type = ["cdylib"]
 
@@ -16,6 +15,3 @@ serde_json = "1.0"
 ic-stable-structures = "0.5.6"
 ic-cdk-macros = "0.8.1"
 jsonwebtoken = { version = "8", default-features = false }
-rand = "0.8.5"
-getrandom = { version = "0.2", features = ["js"] }
-uuid = { version = "1.4.1", features = ["v4", "serde"] }
