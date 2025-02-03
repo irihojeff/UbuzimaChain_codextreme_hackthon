@@ -1,0 +1,22 @@
+type User = record {
+    id : text;
+    username : text;
+    password_hash : text;
+    created_at : nat64;
+};
+
+type AuthPayload = record {
+    username : text;
+    password : text;
+};
+
+type AuthResponse = record {
+    token : text;
+    user_id : text;
+};
+
+service : {
+    register : (AuthPayload) -> (variant { Ok : text; Err : text });
+    login : (AuthPayload) -> (variant { Ok : AuthResponse; Err : text });
+    get_user : (text) -> (opt User) query;
+}

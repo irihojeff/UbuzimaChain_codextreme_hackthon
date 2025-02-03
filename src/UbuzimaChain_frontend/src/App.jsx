@@ -1,31 +1,24 @@
-import { useState } from 'react';
-import { UbuzimaChain_backend } from 'declarations/UbuzimaChain_backend';
+import React, { useState } from 'react';
+import './index.scss';
+import Register from './components/Register';
+import Login from './components/Login';
 
 function App() {
-  const [greeting, setGreeting] = useState('');
+    const [token, setToken] = useState('');
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    UbuzimaChain_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
-
-  return (
-    <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
-      <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting">{greeting}</section>
-    </main>
-  );
+    return (
+        <div className="App">
+            <h1>UbuzimaChain - Hospital Management</h1>
+            {!token ? (
+                <>
+                    <Register />
+                    <Login setToken={setToken} />
+                </>
+            ) : (
+                <div>Welcome, you are logged in!</div>
+            )}
+        </div>
+    );
 }
 
 export default App;
