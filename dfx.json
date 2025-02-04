@@ -22,10 +22,10 @@
     }
   },
   "defaults": {
-    "build": {
-      "args": "",
-      "packtool": ""
-    }
+  "build": {
+    "args": "",
+    "packtool": ""
+  }
   },
   "output_env_file": ".env",
   "version": 1
