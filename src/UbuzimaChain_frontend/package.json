@@ -4,17 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "setup": "npm i && dfx canister create UbuzimaChain_backend && dfx generate UbuzimaChain_backend && dfx deploy",
+    "setup": "npm i && dfx canister create UbuzimaChain_backend && dfx generate && dfx deploy",
     "start": "vite --port 3000",
     "prebuild": "dfx generate",
     "build": "tsc && vite build",
-    "format": "prettier --write \"src/**/*.{json,js,jsx,ts,tsx,css,scss}\""
+    "format": "prettier --write \"src/**/*.{json,js,jsx,ts,tsx,css,scss}\"",
+    "dev": "vite --port 3000",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@dfinity/agent": "^0.15.7",
-    "@dfinity/candid": "^0.15.7",
-    "@dfinity/principal": "^0.15.7",
-    "axios": "^1.7.9",
+    "@dfinity/agent": "^0.20.2",
+    "@dfinity/candid": "^0.20.2",
+    "@dfinity/principal": "^0.20.2",
+    "axios": "^1.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

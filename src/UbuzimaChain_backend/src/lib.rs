@@ -1,13 +1,13 @@
 use candid::{CandidType, Deserialize};
 use ic_cdk::api::time;
-use ic_cdk_macros::*;
+use ic_cdk_macros::{update, query};
+use ic_cdk;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::cell::RefCell;
-use uuid::Uuid;
+use std::sync::atomic::{AtomicU64, Ordering};
 
-// Types
-#[derive(CandidType, Serialize, Deserialize, Clone)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 struct User {
     id: String,
     username: String,
@@ -15,13 +15,13 @@ struct User {
     created_at: u64,
 }
 
-#[derive(CandidType, Serialize, Deserialize)]
+#[derive(CandidType, Serialize, Deserialize, Debug)]
 struct AuthPayload {
     username: String,
     password: String,
 }
 
-#[derive(CandidType, Serialize, Deserialize)]
+#[derive(CandidType, Serialize, Deserialize, Debug)]
 struct AuthResponse {
     token: String,
     user_id: String,
@@ -32,9 +32,12 @@ thread_local! {
     static STATE: RefCell<HashMap<String, User>> = RefCell::new(HashMap::new());
 }
 
+// Global counter using atomic operations
+static COUNTER: AtomicU64 = AtomicU64::new(0);
+
 // Helper functions
 fn hash_password(password: &str) -> String {
-    // In a production environment, you should use a proper password hashing function
+    // In a production environment, use a proper password hashing function like bcrypt
     format!("hashed_{}", password)
 }
 
@@ -43,19 +46,33 @@ fn generate_token(user_id: &str) -> String {
     format!("token_{}", user_id)
 }
 
+// Generate a unique ID using IC timestamp and a counter
+fn generate_unique_id() -> String {
+    let timestamp = time();
+    let counter_value = COUNTER.fetch_add(1, Ordering::SeqCst);
+    format!("{}-{}", timestamp, counter_value)
+}
+
 // Canister methods
 #[update]
-fn register(payload: AuthPayload) -> Result<String, String> {
+fn register_user(payload: AuthPayload) -> Result<String, String> {
+    ic_cdk::print(format!("Attempting to register user: {}", payload.username));
+
     STATE.with(|state| {
         let mut state = state.borrow_mut();
-        
+
+        // Validate input
+        if payload.username.is_empty() || payload.password.is_empty() {
+            return Err("Username and password cannot be empty".to_string());
+        }
+
         // Check if user already exists
         if state.values().any(|u| u.username == payload.username) {
             return Err("Username already exists".to_string());
         }
 
         let user = User {
-            id: Uuid::new_v4().to_string(),
+            id: generate_unique_id(),
             username: payload.username,
             password_hash: hash_password(&payload.password),
             created_at: time(),
@@ -70,7 +87,7 @@ fn register(payload: AuthPayload) -> Result<String, String> {
 fn login(payload: AuthPayload) -> Result<AuthResponse, String> {
     STATE.with(|state| {
         let state = state.borrow();
-        
+
         // Find user and verify password
         if let Some(user) = state.values().find(|u| u.username == payload.username) {
             if hash_password(&payload.password) == user.password_hash {
@@ -80,7 +97,7 @@ fn login(payload: AuthPayload) -> Result<AuthResponse, String> {
                 });
             }
         }
-        
+
         Err("Invalid username or password".to_string())
     })
 }

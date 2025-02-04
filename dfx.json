@@ -3,17 +3,22 @@
     "UbuzimaChain_backend": {
       "candid": "src/UbuzimaChain_backend/UbuzimaChain_backend.did",
       "package": "UbuzimaChain_backend",
-      "type": "rust"
+      "type": "rust",
+      "declarations": {
+        "output": "src/declarations/UbuzimaChain_backend"
+      }
     },
     "UbuzimaChain_frontend": {
       "dependencies": [
         "UbuzimaChain_backend"
       ],
       "source": [
-        "src/UbuzimaChain_frontend/dist"
+        "src/UbuzimaChain_frontend/src"
       ],
       "type": "assets",
-      "workspace": "UbuzimaChain_frontend"
+      "workspace": "UbuzimaChain_frontend",
+      "build": "npm run build",
+      "candid": "src/UbuzimaChain_frontend/src/declarations/UbuzimaChain_frontend/UbuzimaChain_frontend.did"
     }
   },
   "defaults": {

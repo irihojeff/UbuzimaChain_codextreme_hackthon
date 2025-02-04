@@ -9,6 +9,7 @@ dotenv.config({ path: '../../.env' });
 export default defineConfig({
   build: {
     emptyOutDir: true,
+    outDir: 'dist'
   },
   optimizeDeps: {
     esbuildOptions: {
@@ -36,6 +37,12 @@ export default defineConfig({
         find: "declarations",
         replacement: fileURLToPath(
           new URL("../declarations", import.meta.url)
+        ),
+      },
+      {
+        find: "@backend-declarations",
+        replacement: fileURLToPath(
+          new URL("../declarations/UbuzimaChain_backend", import.meta.url)
         ),
       },
     ],
