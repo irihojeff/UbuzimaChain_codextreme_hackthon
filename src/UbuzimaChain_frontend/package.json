@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "setup": "npm i && dfx canister create UbuzimaChain_backend && dfx generate && dfx deploy",
+    "setup": "npm i && dfx canister create ubuzima_chain_backend && dfx generate && dfx deploy",
     "start": "vite --port 3000",
     "prebuild": "dfx generate",
     "build": "tsc && vite build",
