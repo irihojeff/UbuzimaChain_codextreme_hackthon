@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from '../declarations/UbuzimaChain_backend/UbuzimaChain_backend.did.js';
 
-const Login = ({ setToken, setUserId, onError }) => {
+const Login = ({ onLogin, onError }) => {
     const [formData, setFormData] = useState({
         username: '',
         password: ''
@@ -60,8 +60,7 @@ const Login = ({ setToken, setUserId, onError }) => {
 
             // Handle the Result type properly
             if ('Ok' in result) {
-                setToken(result.Ok.token);
-                setUserId(result.Ok.user_id);
+                onLogin(result); // Pass the result to the parent component
                 setFormData({ username: '', password: '' });
                 setMessage({ type: 'success', content: 'Login successful!' });
             } else if ('Err' in result) {

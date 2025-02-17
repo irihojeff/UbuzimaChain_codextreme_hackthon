@@ -1,9 +1,11 @@
-// Dashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from '../declarations/UbuzimaChain_backend/UbuzimaChain_backend.did.js';
 import PatientRegistration from './PatientRegistration';
+import MyProfile from './MyProfile'; // Import the new MyProfile component
+import AdminDashboard from './AdminDashboard'; // Import the new AdminDashboard component
 import { ErrorBoundary } from './ErrorBoundary';
+import { Link, Routes, Route } from 'react-router-dom'; // Import routing components
 
 const Dashboard = ({ userId, token, onLogout }) => {
     const [userDetails, setUserDetails] = useState(null);
@@ -134,6 +136,14 @@ const Dashboard = ({ userId, token, onLogout }) => {
                         onError={setError}
                     />
                 </div>
+                <div className="bg-white shadow rounded-lg p-6">
+                    <Link
+                        to="/my-profile"
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out"
+                    >
+                        View My Profile
+                    </Link>
+                </div>
             </ErrorBoundary>
         </div>
     );
@@ -146,9 +156,12 @@ const Dashboard = ({ userId, token, onLogout }) => {
                     <div className="bg-white shadow rounded-lg p-6">
                         <h3 className="text-lg font-semibold mb-4">User Management</h3>
                         <div className="space-y-2">
-                            <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-                                Manage Users
-                            </button>
+                            <Link
+                                to="/admin-dashboard"
+                                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                            >
+                                Manage Patients
+                            </Link>
                         </div>
                     </div>
                     <div className="bg-white shadow rounded-lg p-6">

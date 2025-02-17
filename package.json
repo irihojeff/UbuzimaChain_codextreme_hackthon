@@ -18,6 +18,7 @@
   "dependencies": {
     "@dfinity/agent": "^2.3.0",
     "@dfinity/auth-client": "^2.3.0",
-    "@dfinity/principal": "^2.2.0"
+    "@dfinity/principal": "^2.2.0",
+    "react-router-dom": "^6.29.0"
   }
 }

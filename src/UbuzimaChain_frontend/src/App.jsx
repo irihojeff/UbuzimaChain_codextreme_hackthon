@@ -3,21 +3,37 @@ import './index.scss';
 import Register from './components/Register';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import MyProfile from './components/MyProfile';
+import AdminDashboard from './components/AdminDashboard';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from 'react-router-dom';
 
 function App() {
+    return (
+        <Router>
+            <AppContent />
+        </Router>
+    );
+}
+
+function AppContent() {
     const [token, setToken] = useState('');
     const [userId, setUserId] = useState('');
+    const [userRole, setUserRole] = useState(null); // Add user role state
     const [error, setError] = useState(null);
-
-    console.log('Current userId in App:', userId);
+    const [showRegister, setShowRegister] = useState(true); // State to toggle between Register and Login forms
+    const navigate = useNavigate(); // Initialize the navigate function
 
     const handleLogin = async (result) => {
         try {
             if ('Ok' in result) {
                 setToken(result.Ok.token);
                 setUserId(result.Ok.user_id);
+                setUserRole(result.Ok.role); // Set user role from login response
                 setError(null);
+
+                // Redirect to the dashboard after successful login
+                navigate('/dashboard');
             } else {
                 throw new Error(result.Err || 'Login failed');
             }
@@ -30,6 +46,7 @@ function App() {
     const handleLogout = () => {
         setToken('');
         setUserId('');
+        setUserRole(null);
         setError(null);
     };
 
@@ -51,26 +68,24 @@ function App() {
     const renderAuthSection = () => (
         <div className="auth-container grid grid-cols-1 md:grid-cols-2 gap-8 p-4 max-w-6xl mx-auto">
             <ErrorBoundary>
-                <Register />
+                {showRegister ? (
+                    <Register />
+                ) : (
+                    <Login
+                        onLogin={handleLogin}
+                        setToken={setToken}
+                        setUserId={setUserId}
+                        onError={setError}
+                    />
+                )}
             </ErrorBoundary>
-            <ErrorBoundary>
-                <Login
-                    setToken={setToken}
-                    setUserId={setUserId}
-                    onError={setError}
-                />
-            </ErrorBoundary>
+            <button
+                onClick={() => setShowRegister(!showRegister)}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out"
+            >
+                {showRegister ? "Already have an account? Log In" : "Don't have an account? Sign Up"}
+            </button>
         </div>
-    );
-
-    const renderDashboard = () => (
-        <ErrorBoundary>
-            <Dashboard
-                userId={userId}
-                token={token}
-                onLogout={handleLogout}
-            />
-        </ErrorBoundary>
     );
 
     return (
@@ -82,7 +97,54 @@ function App() {
 
                 {error && renderError()}
 
-                {!token ? renderAuthSection() : renderDashboard()}
+                <Routes>
+                    <Route
+                        path="/"
+                        element={!token ? <Navigate to="/login" /> : <Navigate to="/dashboard" />}
+                    />
+                    <Route
+                        path="/register"
+                        element={renderAuthSection()}
+                    />
+                    <Route
+                        path="/login"
+                        element={renderAuthSection()}
+                    />
+                    <Route
+                        path="/dashboard"
+                        element={
+                            token ? (
+                                <Dashboard
+                                    userId={userId}
+                                    token={token}
+                                    onLogout={handleLogout}
+                                />
+                            ) : (
+                                <Navigate to="/login" />
+                            )
+                        }
+                    />
+                    <Route
+                        path="/my-profile"
+                        element={
+                            token && userRole === 'Patient' ? (
+                                <MyProfile userId={userId} token={token} />
+                            ) : (
+                                <Navigate to="/dashboard" />
+                            )
+                        }
+                    />
+                    <Route
+                        path="/admin-dashboard"
+                        element={
+                            token && userRole === 'Admin' ? (
+                                <AdminDashboard token={token} />
+                            ) : (
+                                <Navigate to="/dashboard" />
+                            )
+                        }
+                    />
+                </Routes>
             </div>
         </ErrorBoundary>
     );

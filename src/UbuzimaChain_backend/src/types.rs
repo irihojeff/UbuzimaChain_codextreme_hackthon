@@ -18,7 +18,7 @@ pub struct User {
     pub principal_id: String,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)] // Add PartialEq here
 pub enum UserRole {
     Patient,
     Doctor,
@@ -81,7 +81,7 @@ pub struct AuthResponse {
 }
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
-   pub struct PatientRegistrationPayload {
+pub struct PatientRegistrationPayload {
     pub user_id: String,
     pub full_name: String,
     pub date_of_birth: String,
