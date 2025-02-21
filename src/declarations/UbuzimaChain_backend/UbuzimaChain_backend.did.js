@@ -85,6 +85,16 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : UserError })],
         [],
       ),
+    'get_all_patients' : IDL.Func(
+        [],
+        [IDL.Variant({ 'Ok' : IDL.Vec(Patient), 'Err' : UserError })],
+        ['query'],
+      ),
+    'get_my_patient_details' : IDL.Func(
+        [],
+        [IDL.Variant({ 'Ok' : Patient, 'Err' : UserError })],
+        ['query'],
+      ),
     'get_patient' : IDL.Func(
         [IDL.Text],
         [IDL.Variant({ 'Ok' : Patient, 'Err' : UserError })],

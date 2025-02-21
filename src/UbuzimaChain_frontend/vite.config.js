@@ -44,7 +44,7 @@ export default defineConfig({
         replacement: fileURLToPath(
           new URL("../declarations/UbuzimaChain_backend", import.meta.url)
         ),
-      },
+      }
     ],
   },
 });

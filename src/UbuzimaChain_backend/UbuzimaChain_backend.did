@@ -92,4 +92,7 @@ service : {
     add_medical_record: (text, MedicalRecord) -> (variant { Ok: text; Err: UserError });
     get_patient: (text) -> (variant { Ok: Patient; Err: UserError }) query;
     authorize_doctor: (text, text) -> (variant { Ok: null; Err: UserError });
+    // Add these new methods
+    get_my_patient_details: () -> (variant { Ok: Patient; Err: UserError }) query;
+    get_all_patients: () -> (variant { Ok: vec Patient; Err: UserError }) query;
 };

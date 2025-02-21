@@ -81,6 +81,16 @@ export interface _SERVICE {
     { 'Ok' : null } |
       { 'Err' : UserError }
   >,
+  'get_all_patients' : ActorMethod<
+    [],
+    { 'Ok' : Array<Patient> } |
+      { 'Err' : UserError }
+  >,
+  'get_my_patient_details' : ActorMethod<
+    [],
+    { 'Ok' : Patient } |
+      { 'Err' : UserError }
+  >,
   'get_patient' : ActorMethod<
     [string],
     { 'Ok' : Patient } |

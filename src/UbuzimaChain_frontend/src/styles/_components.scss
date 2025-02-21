@@ -1,0 +1,14 @@
+// Component-specific styles
+.dashboard-container {
+    @apply space-y-6;
+  }
+  
+  .auth-container {
+    @apply max-w-6xl mx-auto px-4 mt-8;
+  }
+  
+  .form-container {
+    @apply min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8;
+  }
+  
+  // ... other component styles
