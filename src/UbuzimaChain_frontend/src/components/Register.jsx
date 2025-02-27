@@ -70,80 +70,73 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setMessage({ type: '', content: '' }); // Reset error message
     if (!validateForm()) return;
 
     setLoading(true);
-    setMessage({ type: '', content: '' });
 
     try {
-      const actor = await createActor();
+        const actor = await createActor();
+        console.log("Attempting registration with:", formData);
 
-      const result = await actor.register_user(
-        {
-          username: formData.username,
-          password: formData.password
-        },
-        { [formData.role]: null }
-      );
+        const result = await actor.register_user(
+            { username: formData.username, password: formData.password },
+            { [formData.role]: null }
+        );
 
-      if ('Ok' in result) {
-        setMessage({ 
-          type: 'success', 
-          content: 'Registration successful! You can now log in.' 
-        });
-        setFormData({
-          username: '',
-          password: '',
-          confirmPassword: '',
-          role: 'Patient'
-        });
-      } else if ('Err' in result) {
-        // Handle error variants as defined in the candid interface
-        let errorMessage;
-        switch (result.Err) {
-          case 'UsernameTaken':
-            errorMessage = 'Username already exists';
-            break;
-          case 'InvalidUsername':
-            errorMessage = 'Invalid username format';
-            break;
-          case 'InvalidCredentials': // if applicable during registration
-            errorMessage = 'Invalid credentials provided';
-            break;
-          case 'EmptyFields':
-            errorMessage = 'All fields are required';
-            break;
-          case 'SystemError':
-            errorMessage = 'A system error occurred. Please try again later';
-            break;
-          default:
-            errorMessage = typeof result.Err === 'object'
-              ? 'An unknown error occurred'
-              : result.Err.toString();
+        console.log("Registration response:", result); // Debugging
+
+        if ("Ok" in result) {
+            setMessage({ type: "success", content: "Registration successful! You can now log in." });
+            setFormData({
+                username: '',
+                password: '',
+                confirmPassword: '',
+                role: 'Patient'
+            });
+        } else if ("Err" in result) {
+            // Extract error type from the response
+            const errorType = typeof result.Err === 'object'
+                ? Object.keys(result.Err)[0]
+                : result.Err;
+            
+            console.error("Registration error:", errorType);
+
+            let errorMessage;
+            switch (errorType) {
+                case 'UsernameTaken':
+                    errorMessage = "Username already exists. Please choose another.";
+                    break;
+                case 'InvalidUsername':
+                    errorMessage = "Invalid username format.";
+                    break;
+                case 'WeakPassword':
+                    errorMessage = "Password does not meet security requirements.";
+                    break;
+                case 'EmptyFields':
+                    errorMessage = "All fields are required.";
+                    break;
+                case 'SystemError':
+                    errorMessage = "A system error occurred. Try again later.";
+                    break;
+                default:
+                    errorMessage = `Unknown Error: ${errorType}`;
+            }
+
+            setMessage({ type: "error", content: errorMessage });
         }
-        throw new Error(errorMessage);
-      }
     } catch (error) {
-      console.error('Registration error:', error);
-      
-      let errorMessage;
-      if (error.message.includes('Network configuration error')) {
-        errorMessage = 'Unable to connect to the service. Please check your connection.';
-      } else if (error.message === '[object Object]') {
-        errorMessage = 'Username already exists';
-      } else {
-        errorMessage = error.message;
-      }
-      
-      setMessage({ 
-        type: 'error', 
-        content: errorMessage
-      });
+        console.error("Unexpected Registration Error:", error);
+
+        setMessage({
+            type: "error",
+            content: "Unexpected error: " + (error.message || "Please check your connection and try again.")
+        });
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

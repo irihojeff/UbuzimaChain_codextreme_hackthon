@@ -1,6 +1,6 @@
 use crate::types::{Patient, PatientRegistrationPayload, UserRole};
 use crate::errors::UserError;
-use crate::state::{STATE, PATIENTS, USER_PATIENTS};
+use crate::state::{STATE, PATIENTS, USER_PATIENTS, PRINCIPAL_TO_USER};
 use crate::utils::generate_unique_id;
 use ic_cdk::api::{time, caller};
 use ic_cdk_macros::{update, query};
@@ -10,7 +10,7 @@ pub async fn register_patient(payload: PatientRegistrationPayload) -> Result<Str
     ic_cdk::println!("Received registration payload: {:?}", payload);
     let caller_id = caller().to_text();
     
-    // Check if the user exists
+    // Check if the user exists using payload.user_id
     let user = STATE.with(|state| {
         state.borrow().get(&payload.user_id).cloned()
     }).ok_or(UserError::UserNotFound)?;
@@ -20,9 +20,9 @@ pub async fn register_patient(payload: PatientRegistrationPayload) -> Result<Str
         return Err(UserError::UnauthorizedAccess);
     }
 
-    // Check if the patient is already registered
+    // Check if the patient is already registered using the caller's principal id
     USER_PATIENTS.with(|user_patients| {
-        if user_patients.borrow().contains_key(&payload.user_id) {
+        if user_patients.borrow().contains_key(&caller_id) {
             return Err(UserError::PatientAlreadyRegistered);
         }
         Ok(())
@@ -56,9 +56,9 @@ pub async fn register_patient(payload: PatientRegistrationPayload) -> Result<Str
         patients.borrow_mut().insert(patient_id.clone(), patient);
     });
 
-    // Map the user to the patient
+    // Map the caller's principal id to the patient record
     USER_PATIENTS.with(|user_patients| {
-        user_patients.borrow_mut().insert(payload.user_id, patient_id.clone());
+        user_patients.borrow_mut().insert(caller_id, patient_id.clone());
     });
 
     ic_cdk::println!("Patient registered successfully with ID: {}", patient_id);
@@ -145,22 +145,30 @@ pub fn get_my_patient_details() -> Result<Patient, UserError> {
 #[query]
 pub fn get_all_patients() -> Result<Vec<Patient>, UserError> {
     let caller_id = caller().to_text();
+    ic_cdk::println!("get_all_patients called by: {}", caller_id);
 
-    // Check if the caller is an admin
-    STATE.with(|state| {
-        let state = state.borrow();
-        let user = state.get(&caller_id).ok_or(UserError::UserNotFound)?;
-        if user.role != UserRole::Admin {
-            return Err(UserError::UnauthorizedAccess);
-        }
-        Ok(())
-    })?;
+    let user_id = PRINCIPAL_TO_USER.with(|map| {
+        map.borrow().get(&caller_id).cloned()
+    });
+    ic_cdk::println!("Mapped caller_id to user_id: {:?}", user_id);
 
-    // Retrieve all patients
-    let patients = PATIENTS.with(|patients| {
+    let user_id = user_id.ok_or(UserError::UserNotFound)?;
+
+    let user = STATE.with(|state| {
+        state.borrow().get(&user_id).cloned()
+    });
+    ic_cdk::println!("Fetched user from STATE: {:?}", user);
+
+    let user = user.ok_or(UserError::UserNotFound)?;
+    if user.role != UserRole::Admin {
+        ic_cdk::println!("Caller is not admin. Role: {:?}", user.role);
+        return Err(UserError::UnauthorizedAccess);
+    }
+
+    let patients: Vec<Patient> = PATIENTS.with(|patients| {
         patients.borrow().values().cloned().collect()
     });
 
-    ic_cdk::println!("Retrieved all patients for admin: {}", caller_id);
+    ic_cdk::println!("Retrieved {} patients for admin: {}", patients.len(), caller_id);
     Ok(patients)
 }

@@ -127,7 +127,6 @@ const PatientRegistration = ({ userId, token, actor, onError }) => {
       return;
     }
     try {
-      // Use provided actor if available; otherwise, create a new one.
       const usedActor = actor || await createActor();
       console.log("Submitting payload:", formData);
       
@@ -136,7 +135,6 @@ const PatientRegistration = ({ userId, token, actor, onError }) => {
         full_name: formData.full_name,
         date_of_birth: formData.date_of_birth,
         gender: formData.gender,
-        // Wrap blood_type in an array if provided; otherwise, use null.
         blood_type: formData.blood_type ? [formData.blood_type] : null,
         emergency_contacts: formData.emergency_contacts.map(contact => ({
           name: contact.name,
@@ -144,7 +142,7 @@ const PatientRegistration = ({ userId, token, actor, onError }) => {
           phone: contact.phone
         }))
       };
-
+  
       const result = await usedActor.register_patient(registrationPayload);
       console.log("Registration result:", result);
       if ("Ok" in result) {
@@ -161,22 +159,24 @@ const PatientRegistration = ({ userId, token, actor, onError }) => {
             { name: "", relationship: "", phone: "" },
           ],
         });
-      } else {
-        console.log("Registration error details:", result.Err);
-        const errorType = Object.keys(result.Err)[0];
+      } else if ("Err" in result) {
+        // Customize error handling based on error variant
         let errorMessage;
+        const errorType = typeof result.Err === 'object'
+          ? Object.keys(result.Err)[0]
+          : result.Err;
         switch (errorType) {
           case 'PatientAlreadyRegistered':
-            errorMessage = "You are already registered as a patient";
+            errorMessage = "You are already registered as a patient.";
             break;
           case 'UserNotFound':
-            errorMessage = "User not found";
+            errorMessage = "User not found.";
             break;
           case 'InvalidData':
-            errorMessage = "Invalid data provided";
+            errorMessage = "Invalid data provided.";
             break;
           case 'UnauthorizedAccess':
-            errorMessage = "Unauthorized access";
+            errorMessage = "Unauthorized access.";
             break;
           default:
             errorMessage = `Registration failed: ${errorType}`;
@@ -187,12 +187,13 @@ const PatientRegistration = ({ userId, token, actor, onError }) => {
       console.error("Registration error details:", error);
       setMessage({
         type: "error",
-        content: "Registration failed: " + (error.message || "Check your input and try again")
+        content: "Registration failed: " + (error.message || "Please check your input and try again")
       });
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="max-w-2xl mx-auto p-4">
