@@ -19,10 +19,9 @@ function App() {
 function AppContent() {
   const [token, setToken] = useState('');
   const [userId, setUserId] = useState('');
-  // We'll derive userRole from Dashboard's fetch of user details, so initial state is null.
   const [userRole, setUserRole] = useState(null);
   const [error, setError] = useState(null);
-  const [showRegister, setShowRegister] = useState(true);
+  const [showRegister, setShowRegister] = useState(false); // Start with login
   const navigate = useNavigate();
 
   const handleLogin = async (result) => {
@@ -30,7 +29,7 @@ function AppContent() {
       if ('Ok' in result) {
         setToken(result.Ok.token);
         setUserId(result.Ok.user_id);
-        // Note: Role is fetched later from the user's details
+        // Role will be fetched later from user details
         setError(null);
         navigate('/dashboard');
       } else {
@@ -65,25 +64,43 @@ function AppContent() {
   );
 
   const renderAuthSection = () => (
-    <div className="auth-container grid grid-cols-1 md:grid-cols-2 gap-8 p-4 max-w-6xl mx-auto">
-      <ErrorBoundary>
+    <div className="min-h-screen flex">
+      <div className="flex-1 flex flex-col justify-center items-center bg-gray-50 p-8">
         {showRegister ? (
-          <Register />
+          <>
+            <h2 className="text-2xl font-bold mb-4">Create Your Account</h2>
+            <Register />
+            <p className="mt-4">
+              Already have an account?{' '}
+              <button
+                onClick={() => setShowRegister(false)}
+                className="text-indigo-600 hover:text-indigo-800 font-medium"
+              >
+                Sign In
+              </button>
+            </p>
+          </>
         ) : (
-          <Login
-            onLogin={handleLogin}
-            setToken={setToken}
-            setUserId={setUserId}
-            onError={setError}
-          />
+          <>
+            <h2 className="text-2xl font-bold mb-4">Sign In to Your Account</h2>
+            <Login onLogin={handleLogin} onError={setError} />
+            <p className="mt-4">
+              Don’t have an account?{' '}
+              <button
+                onClick={() => setShowRegister(true)}
+                className="text-indigo-600 hover:text-indigo-800 font-medium"
+              >
+                Sign Up
+              </button>
+            </p>
+          </>
         )}
-      </ErrorBoundary>
-      <button
-        onClick={() => setShowRegister(!showRegister)}
-        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out"
-      >
-        {showRegister ? "Already have an account? Log In" : "Don't have an account? Sign Up"}
-      </button>
+      </div>
+      <div className="hidden md:flex flex-1 bg-indigo-500 items-center justify-center">
+        <h1 className="text-white text-3xl font-bold">
+          UbuzimaChain <br /> Hospital Management
+        </h1>
+      </div>
     </div>
   );
 
@@ -93,14 +110,9 @@ function AppContent() {
         <h1 className="text-3xl font-bold text-center p-4">
           UbuzimaChain - Hospital Management
         </h1>
-
         {error && renderError()}
-
         <Routes>
-          <Route
-            path="/"
-            element={!token ? <Navigate to="/login" /> : <Navigate to="/dashboard" />}
-          />
+          <Route path="/" element={!token ? <Navigate to="/login" /> : <Navigate to="/dashboard" />} />
           <Route path="/register" element={renderAuthSection()} />
           <Route path="/login" element={renderAuthSection()} />
           <Route

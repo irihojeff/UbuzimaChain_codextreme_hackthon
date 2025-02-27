@@ -6,17 +6,14 @@ export class ErrorBoundary extends React.Component {
     this.state = { hasError: false, error: null };
   }
 
-  // Update state when an error is thrown so the fallback UI is rendered.
   static getDerivedStateFromError(error) {
     return { hasError: true, error };
   }
 
-  // Log error details for debugging.
   componentDidCatch(error, errorInfo) {
     console.error('Component Error:', error, errorInfo);
   }
 
-  // Reset the error state when the user clicks "Try Again".
   handleReset = () => {
     this.setState({ hasError: false, error: null });
   };
@@ -36,7 +33,6 @@ export class ErrorBoundary extends React.Component {
         </div>
       );
     }
-
     return this.props.children;
   }
 }

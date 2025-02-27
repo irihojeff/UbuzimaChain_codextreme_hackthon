@@ -12,15 +12,10 @@ const MyProfile = ({ userId, token }) => {
       try {
         const actor = await createActor();
         const result = await actor.get_my_patient_details();
-        
         if (result.Ok) {
           setPatient(result.Ok);
         } else if (result.Err) {
-          // Convert error to string for better clarity
-          const errMsg =
-            typeof result.Err === 'object'
-              ? JSON.stringify(result.Err)
-              : result.Err;
+          const errMsg = typeof result.Err === 'object' ? JSON.stringify(result.Err) : result.Err;
           throw new Error(errMsg);
         }
       } catch (err) {
@@ -81,9 +76,7 @@ const MyProfile = ({ userId, token }) => {
             {patient.emergency_contacts.map((contact, index) => (
               <li key={index} className="ml-4">
                 <p>{contact.name}</p>
-                <p className="text-sm text-gray-600">
-                  {contact.relationship} • {contact.phone}
-                </p>
+                <p className="text-sm text-gray-600">{contact.relationship} • {contact.phone}</p>
               </li>
             ))}
           </ul>
