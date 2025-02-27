@@ -15,10 +15,12 @@ pub struct User {
     pub created_at: u64,
     pub last_login: Option<u64>,
     pub role: UserRole,
+    // Note: Although your candid interface does not list this field,
+    // you may keep internal fields like principal_id if needed.
     pub principal_id: String,
 }
 
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)] // Add PartialEq here
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum UserRole {
     Patient,
     Doctor,
@@ -88,4 +90,27 @@ pub struct PatientRegistrationPayload {
     pub gender: String,
     pub blood_type: Option<String>,
     pub emergency_contacts: Vec<EmergencyContact>,
+}
+
+/// New type for returning system-wide statistics.
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct SystemStats {
+    pub total_users: u64,
+    pub active_doctors: u64,
+    pub total_patients: u64,
+    pub total_records: u64,
+    pub current_time: u64,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Debug)]
+pub enum UserError {
+    UsernameTaken,
+    InvalidCredentials,
+    EmptyFields,
+    UserNotFound,
+    SystemError,
+    PatientNotFound,
+    UnauthorizedAccess,
+    PatientAlreadyRegistered,
+    InvalidData,
 }
