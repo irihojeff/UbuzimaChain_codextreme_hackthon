@@ -11,6 +11,8 @@ UbuzimaChain is an innovative healthcare management system leveraging **smart co
 - **AI-Enhanced Doctor Matching & Triage Optimization**
 - **Immutable Blockchain Storage for Medical Records**
 
+---
+
 ## 🚀 Deployment & Setup
 
 ### Backend Setup
@@ -42,6 +44,8 @@ UbuzimaChain is an innovative healthcare management system leveraging **smart co
    npm run build
    ```
 
+---
+
 ## Usage
 
 ### Registration & Login:
@@ -49,20 +53,24 @@ UbuzimaChain is an innovative healthcare management system leveraging **smart co
 - Upon login, a token is issued, and users are routed to role-based dashboards.
 
 ### Dashboards:
-- **Admin Dashboard:** View a table of all registered patients.
-- **Doctor Dashboard:** Placeholder for patient management and scheduling.
-- **Patient Dashboard & MyProfile:** View and manage personal profiles.
+- **Admin Dashboard:** Displays a table of all registered patients.
+- **Doctor Dashboard:** Placeholder for managing patients and future appointment scheduling.
+- **Patient Dashboard & MyProfile:** Allows patients to view and manage their personal profiles.
 
 ### Authorization:
 - Patients can authorize doctors to access their records securely.
 
+---
+
 ## Future Roadmap
 
-- **Stable Memory Upgrades:** Persist state across canister deploys.
-- **Smart Contract Automation:** Automate appointment scheduling and triage.
-- **AI-Driven Recommendations:** Improve doctor matching based on real-time data.
-- **Enhanced Dashboards:** Add filtering, sorting, and system statistics.
-- **Profile Modification:** Enable patients to update their profiles post-registration.
+- **Stable Memory Upgrades:** Persist state across canister deployments.
+- **Smart Contract Automation:** Automate appointment scheduling and triage to reduce waiting times and medical risks.
+- **AI-Driven Recommendations:** Enhance doctor matching based on availability and patient needs.
+- **Enhanced Dashboards:** Add filtering, sorting, and real-time system statistics for admins and doctors.
+- **Profile Modification:** Allow patients to update their profiles post-registration.
+
+---
 
 ## 🌟 Innovative Vision
 
@@ -74,9 +82,13 @@ With **UbuzimaSpark**, patient registration instantly triggers **automated sched
 
 This isn’t just another hospital management system—it’s a **decentralized, automated ecosystem** that transforms healthcare delivery and saves lives.
 
+---
+
 ## 📢 Team & Contact
 This project is a **collaborative effort** by our **winning team**.  
 For further information or contributions, please contact the **team lead** or **open an issue on GitHub**.
+
+---
 
 ## 📜 License
 [Specify your license here, e.g., MIT, Apache 2.0]
