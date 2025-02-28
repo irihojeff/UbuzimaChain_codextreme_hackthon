@@ -1,8 +1,3 @@
-Below is a full README.md in Markdown format that reflects our current implementation and our innovative vision for UbuzimaChain. You can copy and paste this directly into your repository.
-
----
-
-```markdown
 # UbuzimaChain: Decentralized Healthcare Automation via Smart Contracts and AI
 
 UbuzimaChain is a next-generation healthcare platform that redefines patient management by leveraging blockchain, smart contracts, and AI. Our solution goes beyond traditional hospital management systems—automating critical processes, ensuring data integrity, and enhancing security to reduce waiting times and mitigate medical risks.
@@ -86,7 +81,6 @@ UbuzimaChain is a next-generation healthcare platform that redefines patient man
    ```bash
    cd UbuzimaChain_backend
    cargo install --locked
-   ```
 2. **Build and Deploy the Canister:**
    ```bash
    dfx deploy
