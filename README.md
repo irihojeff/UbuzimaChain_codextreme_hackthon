@@ -142,15 +142,7 @@ UbuzimaChain is a next-generation healthcare platform that redefines patient man
 This project is a collaborative effort by our winning team. For further information or contributions, please contact the team lead or open an issue on GitHub.
 
 ---
-
 ## License
 
-[Specify your license information here, e.g., MIT, Apache 2.0]
 
----
 
-```
-
----
-
-This README.md should display well on GitHub and clearly explain the project to judges, stakeholders, and team members. Let me know if you need any further adjustments or additional sections!
