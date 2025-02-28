@@ -1,61 +1,119 @@
-# UbuzimaChain
+UbuzimaChain
+UbuzimaChain: Decentralized Healthcare Automation via Smart Contracts and AI
 
-Welcome to your new UbuzimaChain project and to the internet computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+UbuzimaChain is a next-generation healthcare platform designed to revolutionize hospital management. Leveraging blockchain technology and smart contracts, our system ensures data integrity, enhances security, and automates critical processes—reducing waiting times and minimizing human error. With a modular architecture, UbuzimaChain offers a robust solution for patient registration, authentication, and management, while paving the way for future AI-driven enhancements.
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+Features
+Decentralized Data Storage:
+Patient records are stored securely using blockchain principles, ensuring immutability and transparency.
 
-To learn more before you start working with UbuzimaChain, see the following documentation available online:
+User Authentication:
 
-- [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
-- [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
-- [Rust Canister Development Guide](https://internetcomputer.org/docs/current/developer-docs/backend/rust/)
-- [ic-cdk](https://docs.rs/ic-cdk)
-- [ic-cdk-macros](https://docs.rs/ic-cdk-macros)
-- [Candid Introduction](https://internetcomputer.org/docs/current/developer-docs/backend/candid/)
+Registration: Users can register with roles (Patient, Doctor, Admin) and secure their accounts with hashed passwords.
+Login: Secure login with token generation and role-based routing.
+Patient Management:
 
-If you want to start working on your project right away, you might want to try the following commands:
+Patient Registration: Patients can register and update their profile.
+Profile Retrieval: Patients can view their own profiles; admins can view all registered patients.
+Doctor Authorization: Patients can grant doctors access to their records.
+Role-Based Dashboards:
 
-```bash
-cd UbuzimaChain/
-dfx help
-dfx canister --help
-```
+Admin Dashboard: Displays a table of all registered patients (future enhancements include system statistics and user management).
+Doctor Dashboard: A placeholder for managing patient appointments and activities.
+Patient Dashboard: Enables patients to view their profile and register if they haven’t done so.
+Future Enhancements:
 
-## Running the project locally
+Smart Contract Automation: Automated appointment booking and triage to reduce waiting times.
+AI-Driven Recommendations: Matching patients with the best available doctors based on various criteria.
+Profile Modification: Allow patients to update their details post-registration.
+Advanced Analytics: Integrate system statistics, filtering, and audit logs for admins.
+Technical Stack
+Backend:
 
-If you want to test your project locally, you can use the following commands:
+Language: Rust
+Framework: ic-cdk and ic-cdk-macros
+Blockchain Integration: Internet Computer Protocol (ICP)
+Data Storage: In-memory state with pre_upgrade/post_upgrade hooks for state persistence (to be implemented for production)
+Frontend:
 
-```bash
-# Starts the replica, running in the background
-dfx start --background
+Library: React
+Tooling: Vite, Tailwind CSS
+Routing: React Router
+API Communication: Dfinity Agent for canister calls
+Architecture Overview
+Authentication Module:
 
-# Deploys your canisters to the replica and generates your candid interface
+Implements user registration and login.
+Users are stored in a global state (STATE), and a mapping (PRINCIPAL_TO_USER) links principals to user IDs.
+Patients Module:
+
+Provides endpoints for patient registration, fetching individual patient details, and admin access to all patients.
+Ensures that only authorized users can access or modify patient data.
+State Management:
+
+Uses thread-local storage (RefCell<HashMap<...>>) to manage users, patients, and mappings.
+In development, state resets on each deploy; future upgrades will implement stable memory persistence.
+Frontend Components:
+
+Auth Components: Login and Registration forms with error handling and role-based redirection.
+Dashboard Components: Separate dashboards for Admin, Doctor, and Patient views.
+Error Boundaries: Catch runtime errors to enhance user experience.
+Installation & Deployment
+Prerequisites
+DFX SDK
+Rust
+Node.js and npm
+Backend (Canister) Setup
+Install Dependencies:
+
+bash
+Copy
+cd UbuzimaChain_backend
+cargo install --locked
+Build and Deploy the Canister:
+
+bash
+Copy
 dfx deploy
-```
+Note: State resets on each deploy during development. For production, implement stable memory upgrades.
 
-Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
+Frontend Setup
+Install Dependencies:
 
-If you have made changes to your backend canister, you can generate a new candid interface with
+bash
+Copy
+cd UbuzimaChain_frontend
+npm install
+Run the Development Server:
 
-```bash
-npm run generate
-```
-
-at any time. This is recommended before starting the frontend development server, and will be run automatically any time you run `dfx deploy`.
-
-If you are making frontend changes, you can start a development server with
-
-```bash
+bash
+Copy
 npm start
-```
+Build for Production:
 
-Which will start a server at `http://localhost:8080`, proxying API requests to the replica at port 4943.
+bash
+Copy
+npm run build
+Usage
+Registration & Login:
+Users can register by providing a username, password, and role. After registration, users log in to receive a token.
 
-### Note on frontend environment variables
+Dashboards:
 
-If you are hosting frontend code somewhere without using DFX, you may need to make one of the following adjustments to ensure your project does not fetch the root key in production:
+Patients: Access their profile via the Patient Dashboard.
+Doctors: Use the Doctor Dashboard (under development) to manage patients.
+Admins: View all patient records via the Admin Dashboard.
+Authorization:
+Patients can authorize doctors to access their records, ensuring secure, role-based data sharing.
 
-- set`DFX_NETWORK` to `ic` if you are using Webpack
-- use your own preferred method to replace `process.env.DFX_NETWORK` in the autogenerated declarations
-  - Setting `canisters -> {asset_canister_id} -> declarations -> env_override to a string` in `dfx.json` will replace `process.env.DFX_NETWORK` with the string in the autogenerated declarations
-- Write your own `createActor` constructor
+Future Roadmap
+Stable Memory Upgrades: Persist state across canister deployments.
+Smart Contract Automation: Integrate automated appointment scheduling and triage to reduce waiting times.
+AI Enhancements: Build intelligent doctor recommendation and predictive analytics.
+Enhanced Dashboards: Add filtering, sorting, and real-time system statistics for admins and doctors.
+Team & Contact
+This project is a collaborative effort. For further information or contributions, please contact the team lead or open an issue on GitHub.
+
+License
+Include your license information here (e.g., MIT, Apache 2.0).
+
