@@ -1,0 +1,6 @@
+/* File: src/styles/_components.scss */
+/* Example: a custom .card class using Tailwind and SCSS variables */
+.card {
+  @apply bg-white rounded shadow p-4;
+  border: 2px solid $primary-color;
+}

@@ -1,34 +1,30 @@
 // File: src/App.jsx
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Navigation from "./components/Navigation";
-import Register from "./components/Register";
 import Login from "./components/Login";
+import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { getUserByPrincipal } from "./services/api.service";
 
-/**
- * Main App that sets up routing and manages global user state.
- */
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
-  // Attempt to auto-fetch user by principal on mount (if they're already logged in).
+  // Attempt auto-fetch of user by principal on mount
   useEffect(() => {
     (async () => {
       try {
         const user = await getUserByPrincipal();
         setCurrentUser(user);
-      } catch (err) {
+      } catch {
         // Not logged in or user not found
       }
     })();
   }, []);
 
   const handleLogout = () => {
-    // Clear user state, in a real app you'd also handle token/internet identity
     setCurrentUser(null);
     navigate("/login");
   };
@@ -36,7 +32,7 @@ function App() {
   return (
     <ErrorBoundary>
       <Navigation currentUser={currentUser} onLogout={handleLogout} />
-      <div className="app-container">
+      <div className="min-h-screen bg-gray-100 p-4">
         <Routes>
           <Route
             path="/"
@@ -52,7 +48,10 @@ function App() {
             path="/login"
             element={<Login setCurrentUser={setCurrentUser} />}
           />
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/register"
+            element={<Register />}
+          />
           <Route
             path="/dashboard"
             element={<Dashboard currentUser={currentUser} />}

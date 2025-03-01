@@ -1,92 +1,71 @@
 // File: src/services/api.service.js
 import { backendActor } from "./actorUtils";
 
-////////////////////
-// User Management
-////////////////////
-export async function registerUser(payload, role) {
-    // Map role string to a proper variant.
-    let roleVariant = {};
-    if (role === "Patient") roleVariant = { Patient: null };
-    else if (role === "Doctor") roleVariant = { Doctor: null };
-    else if (role === "Admin") roleVariant = { Admin: null };
-  
-    const response = await backendActor.register_user(payload, roleVariant);
-    if ("Ok" in response) {
-      return response.Ok; // user_id on success
-    }
-    throw response.Err;
+// Convert role string to candid variant
+function roleToVariant(roleString) {
+  switch (roleString) {
+    case "Patient":
+      return { Patient: null };
+    case "Doctor":
+      return { Doctor: null };
+    case "Admin":
+      return { Admin: null };
+    default:
+      return { Patient: null };
   }
-  
+}
 
+// Register a new user
+export async function registerUser(payload, roleString) {
+  const roleVariant = roleToVariant(roleString);
+  const result = await backendActor.register_user(payload, roleVariant);
+  if ("Ok" in result) {
+    return result.Ok; // user_id
+  }
+  throw result.Err;
+}
+
+// Log in
 export async function loginUser(payload) {
-  const response = await backendActor.login(payload);
-  if ("Ok" in response) {
-    return response.Ok; // AuthResponse
+  const result = await backendActor.login(payload);
+  if ("Ok" in result) {
+    return result.Ok; // AuthResponse
   }
-  throw response.Err;
+  throw result.Err;
 }
 
-export async function getUser(userId) {
-  const response = await backendActor.get_user(userId);
-  if ("Ok" in response) {
-    return response.Ok; // User object
-  }
-  throw response.Err;
-}
-
+// Get user by principal
 export async function getUserByPrincipal() {
-  const response = await backendActor.get_user_by_principal();
-  if ("Ok" in response) {
-    return response.Ok; // User object
+  const result = await backendActor.get_user_by_principal();
+  if ("Ok" in result) {
+    return result.Ok;
   }
-  throw response.Err;
+  throw result.Err;
 }
 
-////////////////////
-// Appointments
-////////////////////
-export async function createAppointment(doctorId, patientId, scheduledTime, notes) {
-  const response = await backendActor.create_appointment(
-    doctorId,
-    patientId,
-    scheduledTime,
-    notes
-  );
-  if ("Ok" in response) {
-    return response.Ok; // appointment_id
+// Get user by user ID
+export async function getUser(userId) {
+  const result = await backendActor.get_user(userId);
+  if ("Ok" in result) {
+    return result.Ok;
   }
-  throw response.Err;
+  throw result.Err;
 }
 
-export async function updateAppointmentStatus(appointmentId, newStatus) {
-  const response = await backendActor.update_appointment_status(appointmentId, newStatus);
-  if ("Ok" in response) {
-    return;
-  }
-  throw response.Err;
-}
-
-export async function getAppointment(appointmentId) {
-  const response = await backendActor.get_appointment(appointmentId);
-  if ("Ok" in response) {
-    return response.Ok;
-  }
-  throw response.Err;
-}
-
-export async function getAppointmentsByDoctor(doctorId) {
-  return await backendActor.get_appointments_by_doctor(doctorId);
-}
-
-export async function getAppointmentsByPatient(patientId) {
-  return await backendActor.get_appointments_by_patient(patientId);
-}
-
+// Create an autonomous appointment
 export async function createAutonomousAppointment(payload) {
-    const response = await backendActor.create_autonomous_appointment(payload);
-    if ("Ok" in response) {
-      return response.Ok;
-    }
-    throw response.Err;
+  const result = await backendActor.create_autonomous_appointment(payload);
+  if ("Ok" in result) {
+    return result.Ok; // appointment_id
   }
+  throw result.Err;
+}
+
+// Get an appointment by ID
+export async function getAppointment(appointmentId) {
+  const result = await backendActor.get_appointment(appointmentId);
+  if ("Ok" in result) {
+    return result.Ok;
+  }
+  throw result.Err;
+}
