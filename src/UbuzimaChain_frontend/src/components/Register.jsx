@@ -18,7 +18,8 @@ function Register() {
       setPassword("");
       setRole("Patient");
     } catch (error) {
-      setMessage(`Error: ${JSON.stringify(error)}`);
+      // Display custom error message from backend
+      setMessage(error.toString());
     }
   };
 

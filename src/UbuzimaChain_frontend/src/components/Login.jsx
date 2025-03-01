@@ -22,7 +22,8 @@ function Login({ setCurrentUser }) {
       setMessage("Login successful!");
       navigate("/dashboard");
     } catch (error) {
-      setMessage(`Error: ${JSON.stringify(error)}`);
+      // Display custom error message from backend
+      setMessage(error.toString());
     }
   };
 
