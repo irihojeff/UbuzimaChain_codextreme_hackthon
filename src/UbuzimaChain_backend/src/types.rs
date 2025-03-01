@@ -17,8 +17,8 @@ pub struct User {
     pub last_login: Option<u64>,
     pub role: UserRole,
     pub principal_id: String,
-    pub specialization: Option<String>, // For doctors: e.g., "Cardiology"
-    pub profile_complete: bool,         // NEW: tracks if the profile is complete
+    pub specialization: Option<String>, // For doctors, e.g., "Cardiology"
+    pub profile_complete: bool,         // NEW: tracks if the user’s profile is complete
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
@@ -103,7 +103,7 @@ pub enum UserError {
 pub enum AppointmentStatus {
     Pending,
     Confirmed,
-    Canceled,
+    Cancelled,
     Completed,
 }
 
@@ -119,7 +119,7 @@ pub struct Appointment {
     pub notes: Option<String>,
 }
 
-// Payload for autonomous appointment creation (patient provides symptoms)
+// Autonomous appointment payload (patient provides symptoms instead of choosing a doctor)
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct AutonomousAppointmentPayload {
     pub patient_id: String,

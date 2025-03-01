@@ -1,4 +1,3 @@
-// File: src/components/Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import { getUser } from "../services/api.service";
 import AutonomousAppointmentSection from "./appointments/AutonomousAppointmentSection";

@@ -12,14 +12,16 @@ pub async fn create_autonomous_appointment(payload: AutonomousAppointmentPayload
     let desired_time = payload.desired_time;
     let caller_id = caller().to_text();
 
+    // Ensure that the caller is the patient
     if caller_id != patient_id {
         return Err(UserError::UnauthorizedAccess);
     }
 
+    // Find doctors with a complete profile and with a specialization that matches the symptoms
     let matching_doctors: Vec<User> = STATE.with(|state| {
         state.borrow().values()
             .filter(|user| {
-                if user.role == UserRole::Doctor {
+                if user.role == UserRole::Doctor && user.profile_complete {
                     if let Some(spec) = &user.specialization {
                         return symptoms.to_lowercase().contains(&spec.to_lowercase());
                     }
@@ -31,9 +33,10 @@ pub async fn create_autonomous_appointment(payload: AutonomousAppointmentPayload
     });
 
     if matching_doctors.is_empty() {
-        return Err(UserError::InvalidData);
+        return Err(UserError::InvalidData); // No doctor found matching criteria
     }
 
+    // Select a doctor with an available slot
     let mut selected_doctor: Option<(User, u64)> = None;
     for doctor in matching_doctors {
         let available_slot = DOCTOR_SCHEDULES.with(|schedules| {
@@ -75,6 +78,7 @@ pub async fn create_autonomous_appointment(payload: AutonomousAppointmentPayload
         appointments.borrow_mut().insert(appointment_id.clone(), new_appointment);
     });
 
+    // Remove the booked slot from the doctor's schedule
     DOCTOR_SCHEDULES.with(|schedules| {
         if let Some(schedule) = schedules.borrow_mut().get_mut(&doctor.id) {
             schedule.available_slots.retain(|&time_slot| time_slot != slot);

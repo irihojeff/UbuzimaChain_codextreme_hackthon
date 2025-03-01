@@ -1,4 +1,3 @@
-// File: src/components/FutureRoadmap.jsx
 import React from "react";
 
 function FutureRoadmap() {

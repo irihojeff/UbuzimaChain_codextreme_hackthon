@@ -1,6 +1,6 @@
 import { backendActor } from "./actorUtils";
 
-// Convert role string to candid variant
+// Helper to convert role string to candid variant
 function roleToVariant(roleString) {
   switch (roleString) {
     case "Patient":
@@ -64,6 +64,5 @@ export async function getAppointment(appointmentId) {
 }
 
 export async function getAppointmentsByPatient(patientId) {
-  // The endpoint returns a raw vector of appointments.
   return await backendActor.get_appointments_by_patient(patientId);
 }

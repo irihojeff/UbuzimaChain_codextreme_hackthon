@@ -1,4 +1,3 @@
-// File: src/components/AppointmentList.jsx
 import React, { useEffect, useState } from "react";
 import { getAppointmentsByPatient } from "../services/api.service";
 

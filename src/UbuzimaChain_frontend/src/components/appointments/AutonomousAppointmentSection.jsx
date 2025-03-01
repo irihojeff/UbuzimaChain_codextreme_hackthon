@@ -1,4 +1,3 @@
-// File: src/components/appointments/AutonomousAppointmentSection.jsx
 import React, { useState } from "react";
 import { createAutonomousAppointment } from "../../services/api.service";
 
