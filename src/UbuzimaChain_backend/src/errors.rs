@@ -15,19 +15,19 @@ pub enum UserError {
     InvalidData,
 }
 
-// Implement Display for UserError to return readable error messages
+// Implement Display for UserError to return user-friendly error messages
 impl fmt::Display for UserError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let error_message = match self {
-            UserError::UsernameTaken => "Username already exists",
-            UserError::InvalidCredentials => "Invalid username or password combination",
-            UserError::EmptyFields => "Please fill in all required fields",
-            UserError::UserNotFound => "The specified user could not be found",
-            UserError::SystemError => "An unexpected system error occurred",
-            UserError::PatientNotFound => "Patient record not found",
-            UserError::UnauthorizedAccess => "Unauthorized access",
-            UserError::PatientAlreadyRegistered => "Patient is already registered",
-            UserError::InvalidData => "Invalid input data",
+            UserError::UsernameTaken => "The chosen username is already in use. Please select a different username.",
+            UserError::InvalidCredentials => "The username or password you entered is incorrect.",
+            UserError::EmptyFields => "All required fields must be filled out.",
+            UserError::UserNotFound => "No user was found with the provided information.",
+            UserError::SystemError => "A system error has occurred. Please try again later.",
+            UserError::PatientNotFound => "The patient record could not be found.",
+            UserError::UnauthorizedAccess => "You are not authorized to perform this action.",
+            UserError::PatientAlreadyRegistered => "This patient is already registered.",
+            UserError::InvalidData => "The data provided is invalid. Please review your input and try again.",
         };
         write!(f, "{}", error_message)
     }
