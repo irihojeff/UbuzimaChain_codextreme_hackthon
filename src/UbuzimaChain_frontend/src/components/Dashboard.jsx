@@ -1,12 +1,15 @@
 // File: src/components/Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import { getUser } from "../services/api.service";
-import AppointmentSection from "./appointments/AppointmentSection";
+import AutonomousAppointmentSection from "./appointments/AutonomousAppointmentSection";
+import AdminDashboard from "./AdminDashboard";
+import DoctorDashboard from "./DoctorDashboard";
+import PatientDashboard from "./PatientDashboard";
 
 function Dashboard({ currentUser }) {
   const [userData, setUserData] = useState(null);
 
-  // Helper to convert variant role to string
+  // Convert role variant to a string
   const getRoleAsString = (role) => {
     if (typeof role === "object" && role !== null) {
       return Object.keys(role)[0];
@@ -28,37 +31,27 @@ function Dashboard({ currentUser }) {
   }, [currentUser]);
 
   if (!currentUser) {
-    return <p>Please log in.</p>;
+    return <p className="p-4">Please log in.</p>;
   }
 
   if (!userData) {
-    return <p>Loading user data...</p>;
+    return <p className="p-4">Loading user data...</p>;
   }
 
   const roleString = getRoleAsString(userData.role);
 
   return (
-    <div className="dashboard-container">
-      <h1>Welcome, {userData.username}</h1>
-      <p>User Role: {roleString}</p>
+    <div className="max-w-3xl mx-auto mt-10 p-4 bg-white shadow rounded">
+      <h1 className="text-2xl font-bold mb-4">Welcome, {userData.username}</h1>
+      <p className="mb-4">Your Role: {roleString}</p>
+
+      {roleString === "Admin" && <AdminDashboard />}
+      {roleString === "Doctor" && <DoctorDashboard />}
       {roleString === "Patient" && (
-        <div>
-          <h2>Patient Section</h2>
-          <AppointmentSection userData={userData} />
-        </div>
-      )}
-      {roleString === "Doctor" && (
-        <div>
-          <h2>Doctor Section</h2>
-          <AppointmentSection userData={userData} />
-        </div>
-      )}
-      {roleString === "Admin" && (
-        <div>
-          <h2>Admin Section</h2>
-          <p>Here you can manage users, view system stats, etc.</p>
-          {/* Add Admin-specific dynamic components here */}
-        </div>
+        <>
+          <PatientDashboard />
+          <AutonomousAppointmentSection userData={userData} />
+        </>
       )}
     </div>
   );

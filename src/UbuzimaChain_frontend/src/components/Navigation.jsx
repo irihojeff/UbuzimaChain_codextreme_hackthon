@@ -4,16 +4,21 @@ import { Link } from "react-router-dom";
 
 function Navigation({ currentUser, onLogout }) {
   return (
-    <nav className="nav-bar">
-      <h2>UbuzimaChain</h2>
-      <ul>
+    <nav className="bg-white shadow p-4 flex items-center justify-between">
+      <h2 className="text-xl font-bold">UbuzimaChain</h2>
+      <ul className="flex items-center gap-4">
         {currentUser ? (
           <>
             <li>
-              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/dashboard" className="text-blue-600 hover:underline">
+                Dashboard
+              </Link>
             </li>
             <li>
-              <button onClick={onLogout} className="logout-btn">
+              <button
+                onClick={onLogout}
+                className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded"
+              >
                 Logout
               </button>
             </li>
@@ -21,10 +26,14 @@ function Navigation({ currentUser, onLogout }) {
         ) : (
           <>
             <li>
-              <Link to="/register">Register</Link>
+              <Link to="/register" className="text-blue-600 hover:underline">
+                Register
+              </Link>
             </li>
             <li>
-              <Link to="/login">Login</Link>
+              <Link to="/login" className="text-blue-600 hover:underline">
+                Login
+              </Link>
             </li>
           </>
         )}

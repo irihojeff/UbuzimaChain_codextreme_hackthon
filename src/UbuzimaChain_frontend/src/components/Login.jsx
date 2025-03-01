@@ -14,8 +14,6 @@ function Login({ setCurrentUser }) {
     setMessage("");
     try {
       const authResponse = await loginUser({ username, password });
-      // In a real app, you'd store the token in local storage or context
-      // For now, let's just fetch the user data from the response
       const user = {
         id: authResponse.user_id,
         username: authResponse.username,
@@ -23,34 +21,43 @@ function Login({ setCurrentUser }) {
       setCurrentUser(user);
       setMessage("Login successful!");
       navigate("/dashboard");
-    } catch (err) {
-      setMessage(`Login error: ${JSON.stringify(err)}`);
+    } catch (error) {
+      setMessage(`Error: ${JSON.stringify(error)}`);
     }
   };
 
   return (
-    <div className="login-container">
-      <h1>Login</h1>
-      <form onSubmit={handleLogin}>
-        <label>Username</label>
-        <input 
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required 
-        />
-
-        <label>Password</label>
-        <input 
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required 
-        />
-
-        <button type="submit">Login</button>
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow rounded">
+      <h1 className="text-2xl font-bold mb-4">Login</h1>
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div>
+          <label className="block mb-1">Username</label>
+          <input
+            type="text"
+            className="border border-gray-300 rounded w-full px-3 py-2"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label className="block mb-1">Password</label>
+          <input
+            type="password"
+            className="border border-gray-300 rounded w-full px-3 py-2"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+        >
+          Login
+        </button>
       </form>
-      {message && <p className="message-box">{message}</p>}
+      {message && <p className="mt-4 bg-yellow-100 p-2 rounded">{message}</p>}
     </div>
   );
 }
