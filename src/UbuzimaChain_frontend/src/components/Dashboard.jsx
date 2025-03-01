@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { getUser } from "../services/api.service";
 import AutonomousAppointmentSection from "./appointments/AutonomousAppointmentSection";
+import AppointmentList from "./AppointmentList";
 import FutureRoadmap from "./FutureRoadmap";
 
 // Placeholders for role-specific dashboards
@@ -12,7 +13,6 @@ import PatientDashboard from "./PatientDashboard";
 function Dashboard({ currentUser }) {
   const [userData, setUserData] = useState(null);
 
-  // Convert role variant to a string
   const getRoleAsString = (role) => {
     if (typeof role === "object" && role !== null) {
       return Object.keys(role)[0];
@@ -54,6 +54,7 @@ function Dashboard({ currentUser }) {
         <>
           <PatientDashboard />
           <AutonomousAppointmentSection userData={userData} />
+          <AppointmentList patientId={userData.id} />
         </>
       )}
 

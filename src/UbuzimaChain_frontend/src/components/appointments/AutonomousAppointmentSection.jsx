@@ -6,7 +6,7 @@ const scenarioOptions = [
   {
     label: "Tooth Pain",
     symptoms: "I woke up with severe tooth pain",
-    desiredTime: "", // Let the system choose an available slot
+    desiredTime: "",
     notes: "Need urgent dental care",
   },
   {
