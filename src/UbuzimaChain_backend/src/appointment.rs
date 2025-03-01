@@ -90,3 +90,13 @@ pub fn get_appointment(appointment_id: String) -> Result<Appointment, UserError>
         appointments.borrow().get(&appointment_id).cloned().ok_or(UserError::InvalidData)
     })
 }
+
+#[query]
+pub fn get_appointments_by_patient(patient_id: String) -> Vec<Appointment> {
+    APPOINTMENTS.with(|appointments| {
+        appointments.borrow().values()
+            .filter(|appt| appt.patient_id == patient_id)
+            .cloned()
+            .collect()
+    })
+}

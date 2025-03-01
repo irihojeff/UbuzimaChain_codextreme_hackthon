@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Navigation from "./components/Navigation";
+import Home from "./components/Home";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
+import PrivateRoute from "./components/PrivateRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { getUserByPrincipal } from "./services/api.service";
 
@@ -13,7 +15,6 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Auto-fetch user by principal on mount
     (async () => {
       try {
         const user = await getUserByPrincipal();
@@ -34,24 +35,22 @@ function App() {
       <Navigation currentUser={currentUser} onLogout={handleLogout} />
       <div className="min-h-screen bg-gray-100 p-4">
         <Routes>
-          <Route
-            path="/"
-            element={
-              currentUser ? (
-                <Dashboard currentUser={currentUser} />
-              ) : (
-                <Login setCurrentUser={setCurrentUser} />
-              )
-            }
-          />
+          <Route path="/" element={<Home />} />
           <Route
             path="/login"
             element={<Login setCurrentUser={setCurrentUser} />}
           />
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/register"
+            element={<Register />}
+          />
           <Route
             path="/dashboard"
-            element={<Dashboard currentUser={currentUser} />}
+            element={
+              <PrivateRoute currentUser={currentUser}>
+                <Dashboard currentUser={currentUser} />
+              </PrivateRoute>
+            }
           />
         </Routes>
       </div>

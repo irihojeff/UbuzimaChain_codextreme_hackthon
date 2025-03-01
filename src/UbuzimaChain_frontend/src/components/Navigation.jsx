@@ -5,9 +5,25 @@ import { Link } from "react-router-dom";
 function Navigation({ currentUser, onLogout }) {
   return (
     <nav className="bg-white shadow p-4 flex items-center justify-between">
-      <h2 className="text-xl font-bold">UbuzimaChain</h2>
+      <Link to="/" className="text-xl font-bold">
+        UbuzimaChain
+      </Link>
       <ul className="flex items-center gap-4">
-        {currentUser ? (
+        {!currentUser && (
+          <>
+            <li>
+              <Link to="/register" className="text-blue-600 hover:underline">
+                Register
+              </Link>
+            </li>
+            <li>
+              <Link to="/login" className="text-blue-600 hover:underline">
+                Login
+              </Link>
+            </li>
+          </>
+        )}
+        {currentUser && (
           <>
             <li>
               <Link to="/dashboard" className="text-blue-600 hover:underline">
@@ -21,19 +37,6 @@ function Navigation({ currentUser, onLogout }) {
               >
                 Logout
               </button>
-            </li>
-          </>
-        ) : (
-          <>
-            <li>
-              <Link to="/register" className="text-blue-600 hover:underline">
-                Register
-              </Link>
-            </li>
-            <li>
-              <Link to="/login" className="text-blue-600 hover:underline">
-                Login
-              </Link>
             </li>
           </>
         )}
