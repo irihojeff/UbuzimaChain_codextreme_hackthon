@@ -1,6 +1,5 @@
 import { backendActor } from "./actorUtils";
 
-// Helper to convert role string to candid variant
 function roleToVariant(roleString) {
   switch (roleString) {
     case "Patient":
@@ -48,7 +47,14 @@ export async function getUser(userId) {
 }
 
 export async function createAutonomousAppointment(payload) {
-  const result = await backendActor.create_autonomous_appointment(payload);
+  // Simply pass the payload without desired_time, as it's removed.
+  const modifiedPayload = {
+    patient_id: payload.patient_id,
+    symptoms: payload.symptoms,
+    notes: payload.notes || null,
+  };
+
+  const result = await backendActor.create_autonomous_appointment(modifiedPayload);
   if ("Ok" in result) {
     return result.Ok;
   }
@@ -65,4 +71,12 @@ export async function getAppointment(appointmentId) {
 
 export async function getAppointmentsByPatient(patientId) {
   return await backendActor.get_appointments_by_patient(patientId);
+}
+
+export async function updateDoctorProfile(specialization) {
+  const result = await backendActor.update_doctor_profile(specialization);
+  if ("Ok" in result) {
+    return;
+  }
+  throw result.Err;
 }

@@ -10,17 +10,14 @@ pub async fn register_user(payload: AuthPayload, role: UserRole) -> Result<Strin
     if payload.username.is_empty() || payload.password.is_empty() {
         return Err(UserError::EmptyFields);
     }
-    
     USERNAMES.with(|usernames| {
         if usernames.borrow().contains_key(&payload.username) {
             return Err(UserError::UsernameTaken);
         }
         Ok(())
     })?;
-    
     let user_id = generate_unique_id();
     let principal_id = caller().to_text();
-    
     let user = User {
         id: user_id.clone(),
         username: payload.username.clone(),
@@ -29,22 +26,18 @@ pub async fn register_user(payload: AuthPayload, role: UserRole) -> Result<Strin
         last_login: None,
         role,
         principal_id: principal_id.clone(),
-        specialization: None,  // By default, not set. For doctors, update later.
-        profile_complete: false, // NEW: New users start as incomplete
+        specialization: None,
+        profile_complete: false, // New users start incomplete
     };
-    
     STATE.with(|state| {
         state.borrow_mut().insert(user_id.clone(), user.clone());
     });
-    
     USERNAMES.with(|usernames| {
         usernames.borrow_mut().insert(payload.username.clone(), user_id.clone());
     });
-    
     PRINCIPAL_TO_USER.with(|map| {
         map.borrow_mut().insert(principal_id, user_id.clone());
     });
-    
     Ok(user_id)
 }
 
@@ -58,7 +51,6 @@ pub async fn login(payload: AuthPayload) -> Result<AuthResponse, UserError> {
             None
         }
     });
-
     match user {
         Some(mut user) => {
             if verify_password(&user.password_hash, &payload.password) {
@@ -66,7 +58,7 @@ pub async fn login(payload: AuthPayload) -> Result<AuthResponse, UserError> {
                 STATE.with(|state| {
                     state.borrow_mut().insert(user.id.clone(), user.clone());
                 });
-                // Removed profile_complete check here so login always succeeds.
+                // For now, allow login even if profile is incomplete.
                 Ok(AuthResponse {
                     token: generate_token(&user.id),
                     user_id: user.id,
@@ -80,7 +72,6 @@ pub async fn login(payload: AuthPayload) -> Result<AuthResponse, UserError> {
         None => Err(UserError::UserNotFound),
     }
 }
-
 
 #[query]
 pub fn get_user(user_id: String) -> Result<User, UserError> {

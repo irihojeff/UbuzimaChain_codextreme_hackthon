@@ -27,7 +27,6 @@ export const idlFactory = ({ IDL }) => {
   });
   const AutonomousAppointmentPayload = IDL.Record({
     'patient_id' : IDL.Text,
-    'desired_time' : IDL.Opt(IDL.Nat64),
     'notes' : IDL.Opt(IDL.Text),
     'symptoms' : IDL.Text,
   });
@@ -125,6 +124,11 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Variant({ 'Ok' : Appointment, 'Err' : UserError })],
         ['query'],
       ),
+    'get_appointments_by_patient' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(Appointment)],
+        ['query'],
+      ),
     'get_my_patient_details' : IDL.Func(
         [],
         [IDL.Variant({ 'Ok' : Patient, 'Err' : UserError })],
@@ -159,6 +163,11 @@ export const idlFactory = ({ IDL }) => {
     'register_user' : IDL.Func(
         [AuthPayload, UserRole],
         [IDL.Variant({ 'Ok' : IDL.Text, 'Err' : UserError })],
+        [],
+      ),
+    'update_doctor_profile' : IDL.Func(
+        [IDL.Text],
+        [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : UserError })],
         [],
       ),
   });

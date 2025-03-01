@@ -13,7 +13,7 @@ type User = record {
   role: UserRole;
   principal_id: text;
   specialization: opt text;
-  profile_complete: bool;       // NEW: tracks if the user's profile is complete
+  profile_complete: bool;
 };
 
 type AuthPayload = record { 
@@ -62,7 +62,7 @@ type Patient = record {
   emergency_contacts: vec EmergencyContact;
   created_at: nat64;
   updated_at: nat64;
-  authorized_doctors: vec text;   // List of doctor IDs authorized by the patient
+  authorized_doctors: vec text;
 };
 
 type PatientRegistrationPayload = record {
@@ -107,9 +107,9 @@ type Appointment = record {
 type AutonomousAppointmentPayload = record {
   patient_id: text;
   symptoms: text;
-  desired_time: opt nat64;
   notes: opt text;
 };
+
 
 type DoctorSchedule = record {
   doctor_id: text;
@@ -130,4 +130,6 @@ service : {
   get_all_patients: () -> (variant { Ok: vec Patient; Err: UserError }) query;
   create_autonomous_appointment: (AutonomousAppointmentPayload) -> (variant { Ok: text; Err: UserError });
   get_appointment: (text) -> (variant { Ok: Appointment; Err: UserError }) query;
+  get_appointments_by_patient: (text) -> (vec Appointment) query;
+  update_doctor_profile: (text) -> (variant { Ok: null; Err: UserError });
 };

@@ -1,4 +1,3 @@
-// File: src/components/Register.jsx
 import React, { useState } from "react";
 import { registerUser } from "../services/api.service";
 
@@ -12,13 +11,12 @@ function Register() {
     e.preventDefault();
     setMessage("");
     try {
-      const userId = await registerUser({ username, password }, role);
-      setMessage(`Registration successful! User ID: ${userId}`);
+      await registerUser({ username, password }, role);
+      setMessage("Registration successful! Please log in.");
       setUsername("");
       setPassword("");
       setRole("Patient");
     } catch (error) {
-      // Display custom error message from backend
       setMessage(error.toString());
     }
   };

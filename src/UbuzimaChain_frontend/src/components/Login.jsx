@@ -1,4 +1,3 @@
-// File: src/components/Login.jsx
 import React, { useState } from "react";
 import { loginUser } from "../services/api.service";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +21,6 @@ function Login({ setCurrentUser }) {
       setMessage("Login successful!");
       navigate("/dashboard");
     } catch (error) {
-      // Display custom error message from backend
       setMessage(error.toString());
     }
   };

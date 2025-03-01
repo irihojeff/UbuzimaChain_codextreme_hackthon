@@ -31,7 +31,6 @@ export interface AuthResponse {
 }
 export interface AutonomousAppointmentPayload {
   'patient_id' : string,
-  'desired_time' : [] | [bigint],
   'notes' : [] | [string],
   'symptoms' : string,
 }
@@ -123,6 +122,7 @@ export interface _SERVICE {
     { 'Ok' : Appointment } |
       { 'Err' : UserError }
   >,
+  'get_appointments_by_patient' : ActorMethod<[string], Array<Appointment>>,
   'get_my_patient_details' : ActorMethod<
     [],
     { 'Ok' : Patient } |
@@ -153,6 +153,11 @@ export interface _SERVICE {
   'register_user' : ActorMethod<
     [AuthPayload, UserRole],
     { 'Ok' : string } |
+      { 'Err' : UserError }
+  >,
+  'update_doctor_profile' : ActorMethod<
+    [string],
+    { 'Ok' : null } |
       { 'Err' : UserError }
   >,
 }

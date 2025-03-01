@@ -17,8 +17,8 @@ pub struct User {
     pub last_login: Option<u64>,
     pub role: UserRole,
     pub principal_id: String,
-    pub specialization: Option<String>, // For doctors, e.g., "Cardiology"
-    pub profile_complete: bool,         // NEW: tracks if the user’s profile is complete
+    pub specialization: Option<String>, // For doctors (e.g., "Cardiology")
+    pub profile_complete: bool,         // NEW: tracks if profile is complete
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
@@ -119,16 +119,13 @@ pub struct Appointment {
     pub notes: Option<String>,
 }
 
-// Autonomous appointment payload (patient provides symptoms instead of choosing a doctor)
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct AutonomousAppointmentPayload {
     pub patient_id: String,
     pub symptoms: String,
-    pub desired_time: Option<u64>,
     pub notes: Option<String>,
 }
 
-// Represents a doctor's schedule with available time slots
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct DoctorSchedule {
     pub doctor_id: String,

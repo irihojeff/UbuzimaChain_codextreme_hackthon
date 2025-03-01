@@ -1,10 +1,9 @@
+// File: src/components/Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import { getUser } from "../services/api.service";
 import AutonomousAppointmentSection from "./appointments/AutonomousAppointmentSection";
 import AppointmentList from "./AppointmentList";
 import FutureRoadmap from "./FutureRoadmap";
-
-// Placeholders for role-specific dashboards
 import AdminDashboard from "./AdminDashboard";
 import DoctorDashboard from "./DoctorDashboard";
 import PatientDashboard from "./PatientDashboard";
@@ -33,22 +32,22 @@ function Dashboard({ currentUser }) {
   }, [currentUser]);
 
   if (!currentUser) {
-    return <p className="p-4">Please log in.</p>;
+    return <p className="p-4 text-center text-lg">Please log in.</p>;
   }
 
   if (!userData) {
-    return <p className="p-4">Loading user data...</p>;
+    return <p className="p-4 text-center text-lg">Loading user data...</p>;
   }
 
   const roleString = getRoleAsString(userData.role);
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-4 bg-white shadow rounded">
-      <h1 className="text-2xl font-bold mb-4">Welcome, {userData.username}</h1>
-      <p className="mb-4">Your Role: {roleString}</p>
+    <div className="max-w-4xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-lg">
+      <h1 className="text-3xl font-bold mb-6">Welcome, {userData.username}</h1>
+      <p className="text-lg mb-6">Your Role: {roleString}</p>
 
       {roleString === "Admin" && <AdminDashboard />}
-      {roleString === "Doctor" && <DoctorDashboard />}
+      {roleString === "Doctor" && <DoctorDashboard userData={userData} />}
       {roleString === "Patient" && (
         <>
           <PatientDashboard />

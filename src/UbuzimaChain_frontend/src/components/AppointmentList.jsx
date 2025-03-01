@@ -13,7 +13,7 @@ function AppointmentList({ patientId }) {
       const appts = await getAppointmentsByPatient(patientId);
       setAppointments(appts);
     } catch (err) {
-      setError(`Error fetching appointments: ${JSON.stringify(err)}`);
+      setError(`Error fetching appointments: ${err.toString()}`);
     } finally {
       setLoading(false);
     }
