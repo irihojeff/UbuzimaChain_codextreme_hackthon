@@ -58,7 +58,7 @@ pub async fn login(payload: AuthPayload) -> Result<AuthResponse, UserError> {
             None
         }
     });
-    
+
     match user {
         Some(mut user) => {
             if verify_password(&user.password_hash, &payload.password) {
@@ -66,9 +66,7 @@ pub async fn login(payload: AuthPayload) -> Result<AuthResponse, UserError> {
                 STATE.with(|state| {
                     state.borrow_mut().insert(user.id.clone(), user.clone());
                 });
-                if !user.profile_complete {
-                    return Err(UserError::InvalidData); // Prompt to complete profile
-                }
+                // Removed profile_complete check here so login always succeeds.
                 Ok(AuthResponse {
                     token: generate_token(&user.id),
                     user_id: user.id,
@@ -82,6 +80,7 @@ pub async fn login(payload: AuthPayload) -> Result<AuthResponse, UserError> {
         None => Err(UserError::UserNotFound),
     }
 }
+
 
 #[query]
 pub fn get_user(user_id: String) -> Result<User, UserError> {

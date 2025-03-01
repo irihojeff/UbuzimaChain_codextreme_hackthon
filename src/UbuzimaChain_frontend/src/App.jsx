@@ -12,8 +12,8 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
-  // Attempt auto-fetch of user by principal on mount
   useEffect(() => {
+    // Auto-fetch user by principal on mount
     (async () => {
       try {
         const user = await getUserByPrincipal();
@@ -48,10 +48,7 @@ function App() {
             path="/login"
             element={<Login setCurrentUser={setCurrentUser} />}
           />
-          <Route
-            path="/register"
-            element={<Register />}
-          />
+          <Route path="/register" element={<Register />} />
           <Route
             path="/dashboard"
             element={<Dashboard currentUser={currentUser} />}

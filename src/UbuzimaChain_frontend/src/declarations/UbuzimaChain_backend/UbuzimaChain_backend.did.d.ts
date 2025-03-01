@@ -82,6 +82,7 @@ export interface User {
   'role' : UserRole,
   'created_at' : bigint,
   'specialization' : [] | [string],
+  'profile_complete' : boolean,
   'principal_id' : string,
 }
 export type UserError = { 'EmptyFields' : null } |
