@@ -1,4 +1,4 @@
-use crate::types::{AuthPayload, AuthResponse, User, UserRole, QueryResponse};
+use crate::types::{AuthPayload, AuthResponse, User, UserRole};
 use crate::errors::UserError;
 use crate::utils::{hash_password, verify_password, generate_token, generate_unique_id};
 use crate::state::{STATE, USERNAMES, PRINCIPAL_TO_USER};
@@ -24,7 +24,7 @@ pub async fn register_user(payload: AuthPayload, role: UserRole) -> Result<Strin
     let user_id = generate_unique_id();
     let principal_id = caller().to_text();
 
-    // Create a new user
+    // Create a new user. For non-doctors, set specialization to None.
     let user = User {
         id: user_id.clone(),
         username: payload.username.clone(),
@@ -33,6 +33,7 @@ pub async fn register_user(payload: AuthPayload, role: UserRole) -> Result<Strin
         last_login: None,
         role,
         principal_id: principal_id.clone(),
+        specialization: None,
     };
 
     // Insert the user into the state
@@ -91,26 +92,24 @@ pub async fn login(payload: AuthPayload) -> Result<AuthResponse, UserError> {
 }
 
 #[query]
-pub fn get_user(user_id: String) -> QueryResponse<User> {
+pub fn get_user(user_id: String) -> Result<User, UserError> {
     match STATE.with(|state| state.borrow().get(&user_id).cloned()) {
-        Some(user) => QueryResponse::Ok(user),
-        None => QueryResponse::Err("User not found".to_string()),
+        Some(user) => Ok(user),
+        None => Err(UserError::UserNotFound),
     }
 }
 
 #[query]
-pub fn get_user_by_principal() -> QueryResponse<User> {
+pub fn get_user_by_principal() -> Result<User, UserError> {
     let caller_principal = caller().to_text();
 
     // Retrieve the user ID associated with the principal
-    let user_id = match PRINCIPAL_TO_USER.with(|map| map.borrow().get(&caller_principal).cloned()) {
-        Some(id) => id,
-        None => return QueryResponse::Err("User not found for principal".to_string()),
-    };
+    let user_id = PRINCIPAL_TO_USER.with(|map| map.borrow().get(&caller_principal).cloned())
+        .ok_or(UserError::UserNotFound)?;
 
     // Retrieve the user by user ID
     match STATE.with(|state| state.borrow().get(&user_id).cloned()) {
-        Some(user) => QueryResponse::Ok(user),
-        None => QueryResponse::Err("User not found".to_string()),
+        Some(user) => Ok(user),
+        None => Err(UserError::UserNotFound),
     }
 }

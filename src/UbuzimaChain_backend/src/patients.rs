@@ -145,30 +145,24 @@ pub fn get_my_patient_details() -> Result<Patient, UserError> {
 #[query]
 pub fn get_all_patients() -> Result<Vec<Patient>, UserError> {
     let caller_id = caller().to_text();
-    ic_cdk::println!("get_all_patients called by: {}", caller_id);
 
-    let user_id = PRINCIPAL_TO_USER.with(|map| {
+    // Get user by principal
+    let user = PRINCIPAL_TO_USER.with(|map| {
         map.borrow().get(&caller_id).cloned()
-    });
-    ic_cdk::println!("Mapped caller_id to user_id: {:?}", user_id);
+    })
+    .and_then(|user_id| STATE.with(|state| state.borrow().get(&user_id).cloned()))
+    .ok_or(UserError::UserNotFound)?;
 
-    let user_id = user_id.ok_or(UserError::UserNotFound)?;
-
-    let user = STATE.with(|state| {
-        state.borrow().get(&user_id).cloned()
-    });
-    ic_cdk::println!("Fetched user from STATE: {:?}", user);
-
-    let user = user.ok_or(UserError::UserNotFound)?;
+    // Ensure the user is an admin
     if user.role != UserRole::Admin {
-        ic_cdk::println!("Caller is not admin. Role: {:?}", user.role);
         return Err(UserError::UnauthorizedAccess);
     }
 
-    let patients: Vec<Patient> = PATIENTS.with(|patients| {
-        patients.borrow().values().cloned().collect()
+    // Retrieve all patients
+    let patients = PATIENTS.with(|patients| {
+        patients.borrow().values().cloned().collect::<Vec<_>>()
     });
 
-    ic_cdk::println!("Retrieved {} patients for admin: {}", patients.len(), caller_id);
+    ic_cdk::println!("Admin {} retrieved {} patients", caller_id, patients.len());
     Ok(patients)
 }

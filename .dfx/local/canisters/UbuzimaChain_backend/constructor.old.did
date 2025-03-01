@@ -1,0 +1,131 @@
+type UserRole = variant {
+    Patient;
+    Doctor;
+    Admin;
+};
+
+type User = record {
+    id: text;
+    username: text;
+    password_hash: text;
+    created_at: nat64;
+    last_login: opt nat64;
+    role: UserRole;
+};
+
+type AuthPayload = record {
+    username: text;
+    password: text;
+};
+
+type AuthResponse = record {
+    token: text;
+    user_id: text;
+    username: text;
+    created_at: nat64;
+};
+
+type EmergencyContact = record {
+    name: text;
+    relationship: text;
+    phone: text;
+};
+
+type Attachment = record {
+    id: text;
+    name: text;
+    content_type: text;
+    encrypted_data: text;
+};
+
+type MedicalRecord = record {
+    id: text;
+    date: nat64;
+    record_type: text;
+    description: text;
+    doctor_id: text;
+    attachments: vec Attachment;
+    encrypted_data: text;
+};
+
+type Patient = record {
+    id: text;
+    user_id: text;
+    full_name: text;
+    date_of_birth: text;
+    gender: text;
+    blood_type: opt text;
+    medical_history: vec MedicalRecord;
+    emergency_contacts: vec EmergencyContact;
+    created_at: nat64;
+    updated_at: nat64;
+    authorized_doctors: vec text;
+};
+
+type PatientRegistrationPayload = record {
+    user_id: text;
+    full_name: text;
+    date_of_birth: text;
+    gender: text;
+    blood_type: opt text;
+    emergency_contacts: vec EmergencyContact;
+};
+
+type UserError = variant {
+    UsernameTaken;
+    InvalidCredentials;
+    EmptyFields;
+    UserNotFound;
+    SystemError;
+    PatientNotFound;
+    UnauthorizedAccess;
+    PatientAlreadyRegistered;
+    InvalidData;
+};
+
+//////////////////////////
+// Appointment Types
+//////////////////////////
+
+type AppointmentStatus = variant {
+    Pending;
+    Confirmed;
+    Cancelled;
+    Completed;
+};
+
+type Appointment = record {
+    id: text;
+    doctor_id: text;
+    patient_id: text;
+    scheduled_time: nat64;
+    status: AppointmentStatus;
+    created_at: nat64;
+    updated_at: nat64;
+    notes: opt text;
+};
+
+//////////////////////////
+// Service Definition
+//////////////////////////
+
+service : {
+    init: () -> ();
+    register_user: (AuthPayload, UserRole) -> (variant { Ok: text; Err: UserError });
+    login: (AuthPayload) -> (variant { Ok: AuthResponse; Err: UserError });
+    get_user: (text) -> (variant { Ok: User; Err: UserError }) query;
+    get_user_by_principal: () -> (variant { Ok: User; Err: UserError }) query;
+    register_patient: (PatientRegistrationPayload) -> (variant { Ok: text; Err: UserError });
+    add_medical_record: (text, MedicalRecord) -> (variant { Ok: text; Err: UserError });
+    get_patient: (text) -> (variant { Ok: Patient; Err: UserError }) query;
+    authorize_doctor: (text, text) -> (variant { Ok: null; Err: UserError });
+    get_my_patient_details: () -> (variant { Ok: Patient; Err: UserError }) query;
+    get_all_patients: () -> (variant { Ok: vec Patient; Err: UserError }) query;
+
+    // Appointment endpoints
+    create_appointment: (text, text, nat64, opt text) -> (variant { Ok: text; Err: UserError });
+    update_appointment_status: (text, AppointmentStatus) -> (variant { Ok: null; Err: UserError });
+    get_appointment: (text) -> (variant { Ok: Appointment; Err: UserError }) query;
+    get_appointments_by_doctor: (text) -> (vec Appointment) query;
+    get_appointments_by_patient: (text) -> (vec Appointment) query;
+};

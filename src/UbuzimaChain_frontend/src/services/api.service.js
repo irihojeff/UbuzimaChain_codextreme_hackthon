@@ -1,46 +1,92 @@
-import { Actor, HttpAgent } from "@dfinity/agent";
-import { idlFactory } from '../declarations/UbuzimaChain_backend/UbuzimaChain_backend.did.js';
+// File: src/services/api.service.js
+import { backendActor } from "./actorUtils";
 
-class ApiService {
-    constructor() {
-        this.actor = null;
+////////////////////
+// User Management
+////////////////////
+export async function registerUser(payload, role) {
+    // Map role string to a proper variant.
+    let roleVariant = {};
+    if (role === "Patient") roleVariant = { Patient: null };
+    else if (role === "Doctor") roleVariant = { Doctor: null };
+    else if (role === "Admin") roleVariant = { Admin: null };
+  
+    const response = await backendActor.register_user(payload, roleVariant);
+    if ("Ok" in response) {
+      return response.Ok; // user_id on success
     }
+    throw response.Err;
+  }
+  
 
-    async createActor() {
-        if (this.actor) return this.actor;
-
-        const canisterId = process.env.CANISTER_ID_UBUZIMACHAIN_BACKEND || 'bkyz2-fmaaa-aaaaa-qaaaq-cai';
-        const host = process.env.DFX_NETWORK === 'ic'
-            ? 'https://boundary.ic0.app'
-            : 'http://localhost:4943';
-
-        const agent = new HttpAgent({ host });
-
-        if (process.env.DFX_NETWORK !== 'ic') {
-            try {
-                await agent.fetchRootKey();
-            } catch (err) {
-                throw new Error('Network configuration error');
-            }
-        }
-
-        this.actor = Actor.createActor(idlFactory, {
-            agent,
-            canisterId,
-        });
-
-        return this.actor;
-    }
-
-    async login(username, password) {
-        const actor = await this.createActor();
-        return actor.login({ username, password });
-    }
-
-    async register(username, password, role) {
-        const actor = await this.createActor();
-        return actor.register_user({ username, password }, { [role]: null });
-    }
+export async function loginUser(payload) {
+  const response = await backendActor.login(payload);
+  if ("Ok" in response) {
+    return response.Ok; // AuthResponse
+  }
+  throw response.Err;
 }
 
-export const apiService = new ApiService();
+export async function getUser(userId) {
+  const response = await backendActor.get_user(userId);
+  if ("Ok" in response) {
+    return response.Ok; // User object
+  }
+  throw response.Err;
+}
+
+export async function getUserByPrincipal() {
+  const response = await backendActor.get_user_by_principal();
+  if ("Ok" in response) {
+    return response.Ok; // User object
+  }
+  throw response.Err;
+}
+
+////////////////////
+// Appointments
+////////////////////
+export async function createAppointment(doctorId, patientId, scheduledTime, notes) {
+  const response = await backendActor.create_appointment(
+    doctorId,
+    patientId,
+    scheduledTime,
+    notes
+  );
+  if ("Ok" in response) {
+    return response.Ok; // appointment_id
+  }
+  throw response.Err;
+}
+
+export async function updateAppointmentStatus(appointmentId, newStatus) {
+  const response = await backendActor.update_appointment_status(appointmentId, newStatus);
+  if ("Ok" in response) {
+    return;
+  }
+  throw response.Err;
+}
+
+export async function getAppointment(appointmentId) {
+  const response = await backendActor.get_appointment(appointmentId);
+  if ("Ok" in response) {
+    return response.Ok;
+  }
+  throw response.Err;
+}
+
+export async function getAppointmentsByDoctor(doctorId) {
+  return await backendActor.get_appointments_by_doctor(doctorId);
+}
+
+export async function getAppointmentsByPatient(patientId) {
+  return await backendActor.get_appointments_by_patient(patientId);
+}
+
+export async function createAutonomousAppointment(payload) {
+    const response = await backendActor.create_autonomous_appointment(payload);
+    if ("Ok" in response) {
+      return response.Ok;
+    }
+    throw response.Err;
+  }
