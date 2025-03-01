@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { getUser } from "../services/api.service";
 import AutonomousAppointmentSection from "./appointments/AutonomousAppointmentSection";
+import FutureRoadmap from "./FutureRoadmap";
+
+// Placeholders for role-specific dashboards
 import AdminDashboard from "./AdminDashboard";
 import DoctorDashboard from "./DoctorDashboard";
 import PatientDashboard from "./PatientDashboard";
@@ -53,6 +56,8 @@ function Dashboard({ currentUser }) {
           <AutonomousAppointmentSection userData={userData} />
         </>
       )}
+
+      <FutureRoadmap />
     </div>
   );
 }

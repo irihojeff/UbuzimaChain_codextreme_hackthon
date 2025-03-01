@@ -78,6 +78,7 @@ export const idlFactory = ({ IDL }) => {
     'role' : UserRole,
     'created_at' : IDL.Nat64,
     'specialization' : IDL.Opt(IDL.Text),
+    'profile_complete' : IDL.Bool,
     'principal_id' : IDL.Text,
   });
   const AuthPayload = IDL.Record({

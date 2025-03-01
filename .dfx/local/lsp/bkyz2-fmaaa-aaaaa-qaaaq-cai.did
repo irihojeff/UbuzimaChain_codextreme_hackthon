@@ -1,4 +1,8 @@
-type UserRole = variant { Patient; Doctor; Admin; };
+type UserRole = variant { 
+  Patient; 
+  Doctor; 
+  Admin; 
+};
 
 type User = record {
   id: text;
@@ -9,15 +13,33 @@ type User = record {
   role: UserRole;
   principal_id: text;
   specialization: opt text;
+  profile_complete: bool;       // NEW: tracks if the user's profile is complete
 };
 
-type AuthPayload = record { username: text; password: text; };
+type AuthPayload = record { 
+  username: text; 
+  password: text; 
+};
 
-type AuthResponse = record { token: text; user_id: text; username: text; created_at: nat64; };
+type AuthResponse = record { 
+  token: text; 
+  user_id: text; 
+  username: text; 
+  created_at: nat64; 
+};
 
-type EmergencyContact = record { name: text; relationship: text; phone: text; };
+type EmergencyContact = record { 
+  name: text; 
+  relationship: text; 
+  phone: text; 
+};
 
-type Attachment = record { id: text; name: text; content_type: text; encrypted_data: text; };
+type Attachment = record { 
+  id: text; 
+  name: text; 
+  content_type: text; 
+  encrypted_data: text; 
+};
 
 type MedicalRecord = record {
   id: text;
@@ -40,7 +62,7 @@ type Patient = record {
   emergency_contacts: vec EmergencyContact;
   created_at: nat64;
   updated_at: nat64;
-  authorized_doctors: vec text;
+  authorized_doctors: vec text;   // List of doctor IDs authorized by the patient
 };
 
 type PatientRegistrationPayload = record {
@@ -64,7 +86,12 @@ type UserError = variant {
   InvalidData;
 };
 
-type AppointmentStatus = variant { Pending; Confirmed; Cancelled; Completed; };
+type AppointmentStatus = variant { 
+  Pending; 
+  Confirmed; 
+  Cancelled; 
+  Completed; 
+};
 
 type Appointment = record {
   id: text;
