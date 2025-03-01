@@ -1,0 +1,99 @@
+use crate::types::{AutonomousAppointmentPayload, Appointment, AppointmentStatus, User, UserRole};
+use crate::errors::UserError;
+use crate::state::{APPOINTMENTS, STATE, DOCTOR_SCHEDULES};
+use crate::utils::generate_unique_id;
+use ic_cdk::api::{caller, time};
+use ic_cdk_macros::{update, query};
+
+#[update]
+pub async fn create_autonomous_appointment(payload: AutonomousAppointmentPayload) -> Result<String, UserError> {
+    let patient_id = payload.patient_id;
+    let symptoms = payload.symptoms;
+    let desired_time = payload.desired_time;
+    let caller_id = caller().to_text();
+
+    // Ensure that the caller is the patient
+    if caller_id != patient_id {
+        return Err(UserError::UnauthorizedAccess);
+    }
+
+    // 1. Find doctors whose specialization matches the symptoms.
+    let matching_doctors: Vec<User> = STATE.with(|state| {
+        state.borrow().values()
+            .filter(|user| {
+                if user.role == UserRole::Doctor {
+                    if let Some(spec) = &user.specialization {
+                        // Simple matching: check if the specialization is mentioned in the symptoms (case-insensitive)
+                        return symptoms.to_lowercase().contains(&spec.to_lowercase());
+                    }
+                }
+                false
+            })
+            .cloned()
+            .collect()
+    });
+
+    if matching_doctors.is_empty() {
+        return Err(UserError::InvalidData); // Could be a custom error: NoMatchingDoctor
+    }
+
+    // 2. Check each matching doctor's schedule for available slots.
+    let mut selected_doctor: Option<(User, u64)> = None;
+    for doctor in matching_doctors {
+        let available_slot = DOCTOR_SCHEDULES.with(|schedules| {
+            let schedules = schedules.borrow();
+            if let Some(schedule) = schedules.get(&doctor.id) {
+                if let Some(desired) = desired_time {
+                    if schedule.available_slots.contains(&desired) {
+                        return Some(desired);
+                    }
+                }
+                // Return the earliest available slot if present.
+                schedule.available_slots.first().cloned()
+            } else {
+                None
+            }
+        });
+
+        if let Some(slot) = available_slot {
+            selected_doctor = Some((doctor, slot));
+            break;
+        }
+    }
+
+    let (doctor, slot) = selected_doctor.ok_or(UserError::InvalidData)?; // Or a more descriptive error
+
+    // 3. Create the appointment record.
+    let appointment_id = generate_unique_id();
+    let now = time();
+    let new_appointment = Appointment {
+        id: appointment_id.clone(),
+        doctor_id: doctor.id.clone(),
+        patient_id: patient_id.clone(),
+        scheduled_time: slot,
+        status: AppointmentStatus::Pending,
+        created_at: now,
+        updated_at: now,
+        notes: payload.notes,
+    };
+
+    APPOINTMENTS.with(|appointments| {
+        appointments.borrow_mut().insert(appointment_id.clone(), new_appointment);
+    });
+
+    // 4. Remove the booked slot from the doctor's schedule.
+    DOCTOR_SCHEDULES.with(|schedules| {
+        if let Some(schedule) = schedules.borrow_mut().get_mut(&doctor.id) {
+            schedule.available_slots.retain(|&time_slot| time_slot != slot);
+        }
+    });
+
+    Ok(appointment_id)
+}
+
+#[query]
+pub fn get_appointment(appointment_id: String) -> Result<Appointment, UserError> {
+    APPOINTMENTS.with(|appointments| {
+        appointments.borrow().get(&appointment_id).cloned().ok_or(UserError::InvalidData)
+    })
+}

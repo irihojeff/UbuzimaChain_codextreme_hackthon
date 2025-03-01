@@ -1,142 +1,61 @@
-import React, { useState } from 'react';
-import './styles/index.scss';
-import Register from './components/Register';
-import Login from './components/Login';
-import Dashboard from './components/Dashboard';
-import MyProfile from './components/MyProfile';
-import AdminDashboard from './components/AdminDashboard';
-import { ErrorBoundary } from './components/ErrorBoundary';
-import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+// File: src/App.jsx
+import React, { useEffect, useState } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import Navigation from "./components/Navigation";
+import Register from "./components/Register";
+import Login from "./components/Login";
+import Dashboard from "./components/Dashboard";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { getUserByPrincipal } from "./services/api.service";
 
+/**
+ * Main App that sets up routing and manages global user state.
+ */
 function App() {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
-}
-
-function AppContent() {
-  const [token, setToken] = useState('');
-  const [userId, setUserId] = useState('');
-  // We'll derive userRole from Dashboard's fetch of user details, so initial state is null.
-  const [userRole, setUserRole] = useState(null);
-  const [error, setError] = useState(null);
-  const [showRegister, setShowRegister] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
-  const handleLogin = async (result) => {
-    try {
-      if ('Ok' in result) {
-        setToken(result.Ok.token);
-        setUserId(result.Ok.user_id);
-        // Note: Role is fetched later from the user's details
-        setError(null);
-        navigate('/dashboard');
-      } else {
-        throw new Error(result.Err || 'Login failed');
+  // Attempt to auto-fetch user by principal on mount (if they're already logged in).
+  useEffect(() => {
+    (async () => {
+      try {
+        const user = await getUserByPrincipal();
+        setCurrentUser(user);
+      } catch (err) {
+        // Not logged in or user not found
       }
-    } catch (err) {
-      setError(err.message);
-      console.error('Login error:', err);
-    }
-  };
+    })();
+  }, []);
 
   const handleLogout = () => {
-    setToken('');
-    setUserId('');
-    setUserRole(null);
-    setError(null);
+    // Clear user state, in a real app you'd also handle token/internet identity
+    setCurrentUser(null);
+    navigate("/login");
   };
-
-  const renderError = () => (
-    <div className="max-w-6xl mx-auto p-4">
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-        <strong className="font-bold">Error: </strong>
-        <span className="block sm:inline">{error}</span>
-        <button
-          className="absolute top-0 right-0 px-4 py-3"
-          onClick={() => setError(null)}
-        >
-          <span className="text-red-500">&times;</span>
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderAuthSection = () => (
-    <div className="auth-container grid grid-cols-1 md:grid-cols-2 gap-8 p-4 max-w-6xl mx-auto">
-      <ErrorBoundary>
-        {showRegister ? (
-          <Register />
-        ) : (
-          <Login
-            onLogin={handleLogin}
-            setToken={setToken}
-            setUserId={setUserId}
-            onError={setError}
-          />
-        )}
-      </ErrorBoundary>
-      <button
-        onClick={() => setShowRegister(!showRegister)}
-        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out"
-      >
-        {showRegister ? "Already have an account? Log In" : "Don't have an account? Sign Up"}
-      </button>
-    </div>
-  );
 
   return (
     <ErrorBoundary>
-      <div className="App">
-        <h1 className="text-3xl font-bold text-center p-4">
-          UbuzimaChain - Hospital Management
-        </h1>
-
-        {error && renderError()}
-
+      <Navigation currentUser={currentUser} onLogout={handleLogout} />
+      <div className="app-container">
         <Routes>
           <Route
             path="/"
-            element={!token ? <Navigate to="/login" /> : <Navigate to="/dashboard" />}
+            element={
+              currentUser ? (
+                <Dashboard currentUser={currentUser} />
+              ) : (
+                <Login setCurrentUser={setCurrentUser} />
+              )
+            }
           />
-          <Route path="/register" element={renderAuthSection()} />
-          <Route path="/login" element={renderAuthSection()} />
+          <Route
+            path="/login"
+            element={<Login setCurrentUser={setCurrentUser} />}
+          />
+          <Route path="/register" element={<Register />} />
           <Route
             path="/dashboard"
-            element={
-              token ? (
-                <Dashboard
-                  userId={userId}
-                  token={token}
-                  onLogout={handleLogout}
-                  setUserRole={setUserRole}
-                />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-          <Route
-            path="/my-profile"
-            element={
-              token && userRole === 'Patient' ? (
-                <MyProfile userId={userId} token={token} />
-              ) : (
-                <Navigate to="/dashboard" />
-              )
-            }
-          />
-          <Route
-            path="/admin-dashboard"
-            element={
-              token && userRole === 'Admin' ? (
-                <AdminDashboard token={token} />
-              ) : (
-                <Navigate to="/dashboard" />
-              )
-            }
+            element={<Dashboard currentUser={currentUser} />}
           />
         </Routes>
       </div>

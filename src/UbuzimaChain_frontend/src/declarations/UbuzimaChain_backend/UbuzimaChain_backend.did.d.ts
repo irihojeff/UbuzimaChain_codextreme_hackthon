@@ -2,6 +2,20 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
 
+export interface Appointment {
+  'id' : string,
+  'scheduled_time' : bigint,
+  'status' : AppointmentStatus,
+  'patient_id' : string,
+  'updated_at' : bigint,
+  'created_at' : bigint,
+  'notes' : [] | [string],
+  'doctor_id' : string,
+}
+export type AppointmentStatus = { 'Confirmed' : null } |
+  { 'Cancelled' : null } |
+  { 'Completed' : null } |
+  { 'Pending' : null };
 export interface Attachment {
   'id' : string,
   'encrypted_data' : string,
@@ -14,6 +28,16 @@ export interface AuthResponse {
   'username' : string,
   'created_at' : bigint,
   'user_id' : string,
+}
+export interface AutonomousAppointmentPayload {
+  'patient_id' : string,
+  'desired_time' : [] | [bigint],
+  'notes' : [] | [string],
+  'symptoms' : string,
+}
+export interface DoctorSchedule {
+  'available_slots' : BigUint64Array | bigint[],
+  'doctor_id' : string,
 }
 export interface EmergencyContact {
   'relationship' : string,
@@ -57,6 +81,8 @@ export interface User {
   'username' : string,
   'role' : UserRole,
   'created_at' : bigint,
+  'specialization' : [] | [string],
+  'principal_id' : string,
 }
 export type UserError = { 'EmptyFields' : null } |
   { 'UsernameTaken' : null } |
@@ -81,9 +107,19 @@ export interface _SERVICE {
     { 'Ok' : null } |
       { 'Err' : UserError }
   >,
+  'create_autonomous_appointment' : ActorMethod<
+    [AutonomousAppointmentPayload],
+    { 'Ok' : string } |
+      { 'Err' : UserError }
+  >,
   'get_all_patients' : ActorMethod<
     [],
     { 'Ok' : Array<Patient> } |
+      { 'Err' : UserError }
+  >,
+  'get_appointment' : ActorMethod<
+    [string],
+    { 'Ok' : Appointment } |
       { 'Err' : UserError }
   >,
   'get_my_patient_details' : ActorMethod<
@@ -97,6 +133,11 @@ export interface _SERVICE {
       { 'Err' : UserError }
   >,
   'get_user' : ActorMethod<[string], { 'Ok' : User } | { 'Err' : UserError }>,
+  'get_user_by_principal' : ActorMethod<
+    [],
+    { 'Ok' : User } |
+      { 'Err' : UserError }
+  >,
   'init' : ActorMethod<[], undefined>,
   'login' : ActorMethod<
     [AuthPayload],

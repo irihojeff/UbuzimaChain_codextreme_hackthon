@@ -1,17 +1,74 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* File: src/styles/index.scss */
 
-// Custom variables
-:root {
-  --primary-color: #4f46e5;
-  --primary-hover: #4338ca;
-  --error-color: #ef4444;
-  --success-color: #22c55e;
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background-color: #f3f3f3;
 }
 
-// Base styles
-body {
-  @apply bg-gray-50 text-gray-900 min-h-screen;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+.app-container {
+  padding: 1rem;
+}
+
+.nav-bar {
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-bar ul {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-bar a,
+.logout-btn {
+  text-decoration: none;
+  color: #333;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font: inherit;
+}
+
+.register-container,
+.login-container,
+.dashboard-container {
+  background-color: #fff;
+  margin: 1rem auto;
+  padding: 1rem;
+  max-width: 600px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+}
+
+input, select, button {
+  display: block;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+button {
+  margin-top: 1rem;
+  cursor: pointer;
+}
+
+.message-box {
+  margin-top: 1rem;
+  background-color: #ffefc2;
+  padding: 0.5rem;
+  border-radius: 4px;
 }
