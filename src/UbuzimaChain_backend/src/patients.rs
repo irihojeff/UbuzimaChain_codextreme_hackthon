@@ -10,33 +10,27 @@ pub async fn register_patient(payload: PatientRegistrationPayload) -> Result<Str
     ic_cdk::println!("Received registration payload: {:?}", payload);
     let caller_id = caller().to_text();
     
-    // Check if the user exists using payload.user_id
     let user = STATE.with(|state| {
         state.borrow().get(&payload.user_id).cloned()
     }).ok_or(UserError::UserNotFound)?;
-
-    // Ensure the caller is the user
+    
     if user.principal_id != caller_id {
         return Err(UserError::UnauthorizedAccess);
     }
-
-    // Check if the patient is already registered using the caller's principal id
+    
     USER_PATIENTS.with(|user_patients| {
         if user_patients.borrow().contains_key(&caller_id) {
             return Err(UserError::PatientAlreadyRegistered);
         }
         Ok(())
     })?;
-
-    // Validate the payload
+    
     if payload.full_name.is_empty() || payload.date_of_birth.is_empty() || payload.gender.is_empty() {
         return Err(UserError::InvalidData);
     }
-
-    // Generate a unique patient ID
+    
     let patient_id = generate_unique_id();
-
-    // Create the patient object
+    
     let patient = Patient {
         id: patient_id.clone(),
         user_id: payload.user_id.clone(),
@@ -50,17 +44,15 @@ pub async fn register_patient(payload: PatientRegistrationPayload) -> Result<Str
         updated_at: time(),
         authorized_doctors: Vec::new(),
     };
-
-    // Store the patient in the state
+    
     PATIENTS.with(|patients| {
         patients.borrow_mut().insert(patient_id.clone(), patient);
     });
-
-    // Map the caller's principal id to the patient record
+    
     USER_PATIENTS.with(|user_patients| {
         user_patients.borrow_mut().insert(caller_id, patient_id.clone());
     });
-
+    
     ic_cdk::println!("Patient registered successfully with ID: {}", patient_id);
     Ok(patient_id)
 }
@@ -73,7 +65,6 @@ pub fn get_patient(patient_id: String) -> Result<Patient, UserError> {
         let patients = patients.borrow();
         let patient = patients.get(&patient_id).ok_or(UserError::PatientNotFound)?;
         
-        // Ensure the caller is authorized to access the patient's data
         if patient.user_id != caller_id && !patient.authorized_doctors.contains(&caller_id) {
             return Err(UserError::UnauthorizedAccess);
         }
@@ -91,34 +82,16 @@ pub async fn authorize_doctor(patient_id: String, doctor_id: String) -> Result<(
         let mut patients = patients.borrow_mut();
         let patient = patients.get_mut(&patient_id).ok_or(UserError::PatientNotFound)?;
         
-        // Ensure the caller is the patient
         if patient.user_id != caller_id {
             return Err(UserError::UnauthorizedAccess);
         }
         
-        // Check if the doctor exists and has the correct role
-        STATE.with(|state| {
-            let state = state.borrow();
-            if let Some(user) = state.get(&doctor_id) {
-                match user.role {
-                    UserRole::Doctor => Ok(()),
-                    _ => Err(UserError::UnauthorizedAccess),
-                }
-            } else {
-                Err(UserError::UserNotFound)
-            }
-        })?;
-        
-        // Clone the doctor_id before pushing it
-        let doctor_id_clone = doctor_id.clone();
-        
-        // Add the doctor to the authorized list if not already present
-        if !patient.authorized_doctors.contains(&doctor_id_clone) {
-            patient.authorized_doctors.push(doctor_id_clone);
+        if !patient.authorized_doctors.contains(&doctor_id) {
+            patient.authorized_doctors.push(doctor_id);
             patient.updated_at = time();
         }
         
-        ic_cdk::println!("Doctor {} authorized for patient {}", doctor_id, patient_id);
+        ic_cdk::println!("Doctor authorized for patient {}", patient_id);
         Ok(())
     })
 }
@@ -126,13 +99,11 @@ pub async fn authorize_doctor(patient_id: String, doctor_id: String) -> Result<(
 #[query]
 pub fn get_my_patient_details() -> Result<Patient, UserError> {
     let caller_id = caller().to_text();
-
-    // Get the patient ID associated with the caller
+    
     let patient_id = USER_PATIENTS.with(|user_patients| {
         user_patients.borrow().get(&caller_id).cloned()
     }).ok_or(UserError::PatientNotFound)?;
-
-    // Retrieve the patient details
+    
     PATIENTS.with(|patients| {
         let patients = patients.borrow();
         let patient = patients.get(&patient_id).ok_or(UserError::PatientNotFound)?;
@@ -145,24 +116,20 @@ pub fn get_my_patient_details() -> Result<Patient, UserError> {
 #[query]
 pub fn get_all_patients() -> Result<Vec<Patient>, UserError> {
     let caller_id = caller().to_text();
-
-    // Get user by principal
+    
     let user = PRINCIPAL_TO_USER.with(|map| {
         map.borrow().get(&caller_id).cloned()
-    })
-    .and_then(|user_id| STATE.with(|state| state.borrow().get(&user_id).cloned()))
+    }).and_then(|user_id| STATE.with(|state| state.borrow().get(&user_id).cloned()))
     .ok_or(UserError::UserNotFound)?;
-
-    // Ensure the user is an admin
+    
     if user.role != UserRole::Admin {
         return Err(UserError::UnauthorizedAccess);
     }
-
-    // Retrieve all patients
+    
     let patients = PATIENTS.with(|patients| {
         patients.borrow().values().cloned().collect::<Vec<_>>()
     });
-
+    
     ic_cdk::println!("Admin {} retrieved {} patients", caller_id, patients.len());
     Ok(patients)
 }

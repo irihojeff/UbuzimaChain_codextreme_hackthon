@@ -17,8 +17,8 @@ pub struct User {
     pub last_login: Option<u64>,
     pub role: UserRole,
     pub principal_id: String,
-    // For doctors, store their specialization (e.g., "Cardiology")
-    pub specialization: Option<String>,
+    pub specialization: Option<String>, // For doctors: e.g., "Cardiology"
+    pub profile_complete: bool,         // NEW: tracks if the profile is complete
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
@@ -73,7 +73,7 @@ pub struct Patient {
     pub emergency_contacts: Vec<EmergencyContact>,
     pub created_at: u64,
     pub updated_at: u64,
-    pub authorized_doctors: Vec<String>,
+    pub authorized_doctors: Vec<String>, // List of doctor IDs authorized by the patient
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
@@ -103,7 +103,7 @@ pub enum UserError {
 pub enum AppointmentStatus {
     Pending,
     Confirmed,
-    Cancelled,
+    Canceled,
     Completed,
 }
 
@@ -119,7 +119,7 @@ pub struct Appointment {
     pub notes: Option<String>,
 }
 
-// Autonomous appointment payload. Patient provides symptoms instead of selecting a doctor.
+// Payload for autonomous appointment creation (patient provides symptoms)
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct AutonomousAppointmentPayload {
     pub patient_id: String,
@@ -128,7 +128,7 @@ pub struct AutonomousAppointmentPayload {
     pub notes: Option<String>,
 }
 
-// Represents a doctor's schedule with available time slots.
+// Represents a doctor's schedule with available time slots
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct DoctorSchedule {
     pub doctor_id: String,
